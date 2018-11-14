@@ -12,10 +12,24 @@ class ActividadEconomicaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( Request $request )
+    public function index(Request $request)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Acteconomica = Acteconomica::where('Estado', 'ACT')->paginate($request->input('psize'));
+            return response($Acteconomica, 201);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function combo(Request $request)
+    {
+        if ($request->isJson()) {
+            $Acteconomica = Acteconomica::where('Estado', 'ACT')->get();
             return response($Acteconomica, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -34,14 +48,14 @@ class ActividadEconomicaController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Acteconomica = new Acteconomica();
-            $Acteconomica->fill( $request->all() );
+            $Acteconomica->fill($request->all());
             $Acteconomica->save();
             return response($Acteconomica, 201);
         }
@@ -51,12 +65,12 @@ class ActividadEconomicaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Acteconomica = Acteconomica::find($id);
             return response($Acteconomica, 201);
         }
@@ -66,7 +80,7 @@ class ActividadEconomicaController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -77,15 +91,15 @@ class ActividadEconomicaController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Acteconomica = Acteconomica::find($id);
-            $Acteconomica->fill( $request->all() );
+            $Acteconomica->fill($request->all());
             $Acteconomica->save();
             return response($Acteconomica, 201);
         }
@@ -95,12 +109,12 @@ class ActividadEconomicaController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Acteconomica = Acteconomica::find($id);
             $Acteconomica->Estado = 'INA';
             $Acteconomica->save();

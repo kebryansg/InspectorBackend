@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cargo;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 
-class CargoController extends Controller
+class EmpresaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +14,9 @@ class CargoController extends Controller
      */
     public function index( Request $request )
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::paginate($request->input('psize'));
-            return response($Cargo, 201);
+        if($request->isJson()){
+            $Empresas = Empresa::where('Estado', 'ACT')->paginate($request->input('psize'));
+            return response($Empresas, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -39,13 +39,12 @@ class CargoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = new Cargo();
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
+        if($request->isJson()){
+            $Empresa = new Tipoempresa();
+            $Empresa->fill( $request->all() );
+            $Empresa->save();
+            return response($Empresa, 201);
         }
-        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**
@@ -54,11 +53,11 @@ class CargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show( Request $request, $id )
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            return response($Cargo, 201);
+        if($request->isJson()){
+            $Empresa = Empresa::find($id);
+            return response($Empresa, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -83,11 +82,11 @@ class CargoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
+        if($request->isJson()){
+            $Empresa = Empresa::find($id);
+            $Empresa->fill( $request->all() );
+            $Empresa->save();
+            return response($Empresa, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -100,11 +99,11 @@ class CargoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->Estado = 'INA';
-            $Cargo->save();
-            return response($Cargo, 201);
+        if($request->isJson()){
+            $Empresa= Empresa::find($id);
+            $Empresa->Estado = 'INA';
+            $Empresa->save();
+            return response($Empresa, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }

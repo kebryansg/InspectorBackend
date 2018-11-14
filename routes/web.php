@@ -41,11 +41,24 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->put('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@update']);
     $router->delete('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@destroy']);
 
+    $router->get('empresa', ["uses" => "EmpresaController@index"]);
+    $router->get('empresa/{id}', ['uses' => 'EmpresaController@show']);
+    $router->post('empresa', ['uses' => 'EmpresaController@store']);
+    $router->put('empresa/{id}', ['uses' => 'EmpresaController@update']);
+    $router->delete('empresa/{id}', ['uses' => 'EmpresaController@destroy']);
+
+    $router->get('clasificacion', ["uses" => "ClasificacionController@index"]);
+    $router->get('clasificacion/{id}', ['uses' => 'ClasificacionController@show']);
+    $router->post('clasificacion', ['uses' => 'ClasificacionController@store']);
+    $router->put('clasificacion/{id}', ['uses' => 'ClasificacionController@update']);
+    $router->delete('clasificacion/{id}', ['uses' => 'ClasificacionController@destroy']);
+
     $router->get('acteconomica', ["uses" => "ActividadEconomicaController@index"]);
     $router->get('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@show']);
     $router->post('acteconomica', ['uses' => 'ActividadEconomicaController@store']);
     $router->put('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@update']);
     $router->delete('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@destroy']);
+    $router->get('acteconomica_combo', ["uses" => "ActividadEconomicaController@combo"]);
 
     $router->get('entidad', ["uses" => "EntidadController@index"]);
     $router->get('entidad/{id}', ['uses' => 'EntidadController@show']);
