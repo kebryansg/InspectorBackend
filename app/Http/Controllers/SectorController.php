@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cargo;
+use App\Models\Sector;
 use Illuminate\Http\Request;
 
-class CargoController extends Controller
+class SectorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +14,13 @@ class CargoController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::paginate($request->input('psize'));
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Sector = Sector::
+            join('Parroquia', 'Parroquia.ID', 'IDParroquia')
+            ->join('Canton', 'Canton.ID', 'IDCanton')
+            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+            ->select([ 'Sector.*', 'Provincia.Descripcion as Provincia', 'Canton.Descripcion as Canton', 'Parroquia.Descripcion as Parroquia' ])
+            ->paginate($request->input('psize'));
+        return response($Sector, 201);
     }
 
     /**
@@ -28,8 +30,8 @@ class CargoController extends Controller
      */
     public function combo(Request $request)
     {
-        $Cargo = Cargo::where('Estado', 'ACT')->get();
-        return response($Cargo, 201);
+        $Sector = Sector::where('Estado', 'ACT')->where('IDParroquia', $request->input('Parroquia') )->get();
+        return response($Sector, 201);
     }
 
     /**
@@ -50,13 +52,8 @@ class CargoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = new Cargo();
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Sector = Sector::insertGetId($request->all());
+        return response($Sector, 201);
     }
 
     /**
@@ -67,11 +64,13 @@ class CargoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+//        $Sector = Sector::find($id);
+        $Sector = Sector::find($id)
+            ->join('Parroquia', 'Parroquia.ID', 'IDParroquia')
+            ->join('Canton', 'Canton.ID', 'IDCanton')
+            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+            ->first([ 'Parroquia.*', 'Provincia.ID as Provincia', 'Canton.ID as Canton' ]);
+        return response($Sector, 201);
     }
 
     /**
@@ -94,13 +93,10 @@ class CargoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Sector = Sector::find($id);
+        $Sector->fill($request->all());
+        $Sector->save();
+        return response($Sector, 201);
     }
 
     /**
@@ -111,12 +107,9 @@ class CargoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->Estado = 'INA';
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Sector = Sector::find($id);
+        $Sector->Estado = 'INA';
+        $Sector->save();
+        return response($Sector, 201);
     }
 }

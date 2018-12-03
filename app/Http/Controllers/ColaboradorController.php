@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cargo;
+use App\Models\Colaborador;
 use Illuminate\Http\Request;
 
-class CargoController extends Controller
+class ColaboradorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,21 +15,14 @@ class CargoController extends Controller
     public function index(Request $request)
     {
         if ($request->isJson()) {
-            $Cargo = Cargo::paginate($request->input('psize'));
-            return response($Cargo, 201);
+            $Clasificacion = Colaborador::join('Cargo', 'Cargo.ID', 'IDCargo')
+                ->join('Area', 'Area.ID', 'IDArea')
+                ->join('Compania', 'Compania.ID', 'IDCompania')
+                ->select(['Colaborador.*', 'Cargo.Descripcion as Cargo', 'Area.Descripcion as Area', 'Compania.Nombre as Compania'])
+                ->paginate($request->input('psize'));
+            return response($Clasificacion, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function combo(Request $request)
-    {
-        $Cargo = Cargo::where('Estado', 'ACT')->get();
-        return response($Cargo, 201);
     }
 
     /**
@@ -50,13 +43,10 @@ class CargoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = new Cargo();
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Colaborador = new Colaborador();
+        $Colaborador->fill($request->all());
+        $Colaborador->save();
+        return response($Colaborador, 201);
     }
 
     /**
@@ -67,11 +57,9 @@ class CargoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Colaborador = Colaborador::find($id);
+        return response($Colaborador, 201);
+
     }
 
     /**
@@ -94,13 +82,10 @@ class CargoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Colaborador= Colaborador::find($id);
+        $Colaborador->fill($request->all());
+        $Colaborador->save();
+        return response($Colaborador, 201);
     }
 
     /**
@@ -111,12 +96,9 @@ class CargoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->Estado = 'INA';
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Colaborador= Colaborador::find($id);
+        $Colaborador->Estado = 'INA';
+        $Colaborador->save();
+        return response($Colaborador, 201);
     }
 }

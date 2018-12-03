@@ -15,7 +15,21 @@ class TipoEmpresaController extends Controller
     public function index( Request $request )
     {
         if($request->isJson()){
-            $Tipoempresas = Tipoempresa::where('Estado', 'ACT')->paginate($request->input('psize'));
+            $Tipoempresas = Tipoempresa::paginate($request->input('psize'));
+            return response($Tipoempresas, 201);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function combo( Request $request )
+    {
+        if($request->isJson()){
+            $Tipoempresas = Tipoempresa::where('Estado', 'ACT')->get();
             return response($Tipoempresas, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);

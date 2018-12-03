@@ -40,7 +40,7 @@ class EmpresaController extends Controller
     public function store(Request $request)
     {
         if($request->isJson()){
-            $Empresa = new Tipoempresa();
+            $Empresa = new Empresa();
             $Empresa->fill( $request->all() );
             $Empresa->save();
             return response($Empresa, 201);
@@ -56,7 +56,11 @@ class EmpresaController extends Controller
     public function show( Request $request, $id )
     {
         if($request->isJson()){
-            $Empresa = Empresa::find($id);
+//            $Empresa = Empresa::find($id);
+            $Empresa = Empresa::find($id)
+                        ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
+                        ->join('ActEconomica', 'ActEconomica.ID', 'IDActEconomica')
+                        ->first([ 'Empresa.*', 'ActEconomica.ID as ActEconomica' ]);
             return response($Empresa, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);

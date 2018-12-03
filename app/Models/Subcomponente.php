@@ -2,12 +2,12 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Mon, 03 Dec 2018 20:49:33 +0000.
  */
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Reliese\Database\Eloquent\Model as Eloquent;
 
 /**
  * Class Subcomponente
@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDComponente
  * 
  * @property \App\Models\Componente $componente
- * @property \Illuminate\Database\Eloquent\Collection $atributos
  *
  * @package App\Models
  */
@@ -43,10 +42,5 @@ class Subcomponente extends Eloquent
 	public function componente()
 	{
 		return $this->belongsTo(\App\Models\Componente::class, 'IDComponente');
-	}
-
-	public function atributos()
-	{
-		return $this->hasMany(\App\Models\Atributo::class, 'IDSubComponente');
 	}
 }

@@ -31,18 +31,18 @@ class Clasificacion extends Eloquent
 
 	protected $casts = [
 		'ID' => 'int',
-		'IDActEconomia' => 'int'
+		'IDActEconomica' => 'int'
 	];
 
 	protected $fillable = [
 		'Descripcion',
 		'Estado',
-		'IDActEconomia'
+		'IDActEconomica'
 	];
 
 	public function acteconomica()
 	{
-		return $this->belongsTo(\App\Models\Acteconomica::class, 'IDActEconomia');
+		return $this->belongsTo(\App\Models\Acteconomica::class, 'IDActEconomica');
 	}
 
 	public function empresas()

@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Wed, 14 Nov 2018 16:58:07 +0000.
  */
 
 namespace App\Models;
@@ -10,7 +10,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
- * Class Compañium
+ * Class Companium
  * 
  * @property int $ID
  * @property string $Nombre
@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  *
  * @package App\Models
  */
-class Compañium extends Eloquent
+class Companium extends Eloquent
 {
 	protected $primaryKey = 'ID';
 	public $timestamps = false;

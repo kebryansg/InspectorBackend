@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cargo;
+use App\Models\Parroquium;
 use Illuminate\Http\Request;
 
-class CargoController extends Controller
+class ParroquiaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +14,12 @@ class CargoController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::paginate($request->input('psize'));
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Parroquium = Parroquium::
+            join('Canton', 'Canton.ID', 'IDCanton')
+            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+            ->select([ 'Parroquia.*', 'Provincia.Descripcion as Provincia', 'Canton.Descripcion as Canton' ])
+            ->paginate($request->input('psize'));
+        return response($Parroquium, 201);
     }
 
     /**
@@ -28,8 +29,8 @@ class CargoController extends Controller
      */
     public function combo(Request $request)
     {
-        $Cargo = Cargo::where('Estado', 'ACT')->get();
-        return response($Cargo, 201);
+        $Parroquium = Parroquium::where('Estado', 'ACT')->where('IDCanton', $request->input('Canton') )->get();
+        return response($Parroquium, 201);
     }
 
     /**
@@ -50,13 +51,8 @@ class CargoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = new Cargo();
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Parroquium = Parroquium::insertGetId($request->all());
+        return response($Parroquium, 201);
     }
 
     /**
@@ -67,11 +63,12 @@ class CargoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+//        $Parroquium = Parroquium::find($id);
+        $Parroquium = Parroquium::find($id)
+                ->join('Canton', 'Canton.ID', 'IDCanton')
+                ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+                ->first([ 'Parroquia.*', 'Provincia.ID as Provincia' ]);
+        return response($Parroquium, 201);
     }
 
     /**
@@ -94,13 +91,10 @@ class CargoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Parroquium = Parroquium::find($id);
+        $Parroquium->fill($request->all());
+        $Parroquium->save();
+        return response($Parroquium, 201);
     }
 
     /**
@@ -111,12 +105,9 @@ class CargoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->Estado = 'INA';
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Parroquium = Parroquium::find($id);
+        $Parroquium->Estado = 'INA';
+        $Parroquium->save();
+        return response($Parroquium, 201);
     }
 }

@@ -22,6 +22,20 @@ class ClasificacionController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function combo( Request $request )
+    {
+        if ($request->isJson()) {
+            $Clasificacion = Clasificacion::where('Estado', 'ACT')->where('IDActEconomica', $request->input('ActEconomica') )->get();
+            return response($Clasificacion, 201);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

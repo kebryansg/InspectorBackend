@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Companium;
-use App\Models\Institucion;
+use App\Models\Provincium;
 use Illuminate\Http\Request;
 
-class CompaniaController extends Controller
+class ProvinciaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,14 +15,10 @@ class CompaniaController extends Controller
     public function index(Request $request)
     {
         if ($request->isJson()) {
-            $Companiums = Companium::where('Compania.Estado', 'ACT')
-                ->join('Institucion', 'Institucion.ID', '=', 'IDInstitucion')
-                ->select('Compania.*', 'Institucion.Nombre as Institucion')
-                ->paginate($request->input('psize'));
-            return response($Companiums, 201);
+            $Provincium = Provincium::paginate($request->input('psize'));
+            return response($Provincium, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
-
     }
 
     /**
@@ -33,9 +28,8 @@ class CompaniaController extends Controller
      */
     public function combo(Request $request)
     {
-        $Companiums = Companium::where('Compania.Estado', 'ACT')->get();
-        return response($Companiums, 201);
-
+        $Provincium = Provincium::where('Estado', 'ACT')->get();
+        return response($Provincium, 201);
     }
 
     /**
@@ -57,11 +51,10 @@ class CompaniaController extends Controller
     public function store(Request $request)
     {
         if ($request->isJson()) {
-            $Companium = new Companium();
-            $Companium->fill($request->all());
-            $Companium->IDInstitucion = Institucion::first()->ID;
-            $Companium->save();
-            return response($Companium, 201);
+            $Provincium = new Provincium();
+            $Provincium->fill($request->all());
+            $Provincium->save();
+            return response($Provincium, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -75,8 +68,8 @@ class CompaniaController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->isJson()) {
-            $Companium = Companium::find($id);
-            return response($Companium, 201);
+            $Provincium = Provincium::find($id);
+            return response($Provincium, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -102,10 +95,10 @@ class CompaniaController extends Controller
     public function update(Request $request, $id)
     {
         if ($request->isJson()) {
-            $Companium = Companium::find($id);
-            $Companium->fill($request->all());
-            $Companium->save();
-            return response($Companium, 201);
+            $Provincium = Provincium::find($id);
+            $Provincium->fill($request->all());
+            $Provincium->save();
+            return response($Provincium, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -119,10 +112,10 @@ class CompaniaController extends Controller
     public function destroy(Request $request, $id)
     {
         if ($request->isJson()) {
-            $Companium = Companium::find($id);
-            $Companium->Estado = 'INA';
-            $Companium->save();
-            return response($Companium, 201);
+            $Provincium = Provincium::find($id);
+            $Provincium->Estado = 'INA';
+            $Provincium->save();
+            return response($Provincium, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
