@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Wed, 05 Dec 2018 18:38:13 +0000.
  */
 
 namespace App\Models;
@@ -15,10 +15,11 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $ID
  * @property string $Descripcion
  * @property string $Estado
- * @property int $IDFormulario
+ * @property int $IDTipoComp
+ * @property int $IDSeccion
  * 
- * @property \App\Models\Formulario $formulario
- * @property \Illuminate\Database\Eloquent\Collection $subcomponentes
+ * @property \App\Models\Tipocomp $tipocomp
+ * @property \App\Models\Seccion $seccion
  *
  * @package App\Models
  */
@@ -31,22 +32,24 @@ class Componente extends Eloquent
 
 	protected $casts = [
 		'ID' => 'int',
-		'IDFormulario' => 'int'
+		'IDTipoComp' => 'int',
+		'IDSeccion' => 'int'
 	];
 
 	protected $fillable = [
 		'Descripcion',
 		'Estado',
-		'IDFormulario'
+		'IDTipoComp',
+		'IDSeccion'
 	];
 
-	public function formulario()
+	public function tipocomp()
 	{
-		return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
+		return $this->belongsTo(\App\Models\Tipocomp::class, 'IDTipoComp');
 	}
 
-	public function subcomponentes()
+	public function seccion()
 	{
-		return $this->hasMany(\App\Models\Subcomponente::class, 'IDComponente');
+		return $this->belongsTo(\App\Models\Seccion::class, 'IDSeccion');
 	}
 }

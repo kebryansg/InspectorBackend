@@ -28,11 +28,8 @@ class ActividadEconomicaController extends Controller
      */
     public function combo(Request $request)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::where('Estado', 'ACT')->get();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = Acteconomica::with('clasificacions')->where('Estado', 'ACT')->get();
+        return response($Acteconomica, 201);
     }
 
     /**

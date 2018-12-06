@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Departamento;
+use App\Models\Componente;
 use Illuminate\Http\Request;
 
-class DepartamentoController extends Controller
+class ComponenteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class DepartamentoController extends Controller
      */
     public function index(Request $request)
     {
-        $Departamento = Departamento::where('Estado', 'ACT')->paginate($request->input('psize'));
-        return response($Departamento, 201);
+        $Componente = Componente::paginate($request->input('psize'));
+        return response($Componente, 201);
     }
 
     /**
@@ -25,8 +25,8 @@ class DepartamentoController extends Controller
      */
     public function combo(Request $request)
     {
-        $Departamento = Departamento::with('areas')->where('Estado', 'ACT')->get();
-        return response($Departamento, 201);
+        $Componente = Componente::where('Estado', 'ACT')->where('IDProvincia', $request->input('Provincia') )->get();
+        return response($Componente, 201);
     }
 
     /**
@@ -47,13 +47,8 @@ class DepartamentoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Departamento = new Departamento();
-            $Departamento->fill($request->all());
-            $Departamento->save();
-            return response($Departamento, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Componente = Componente::insertGetId($request->all());
+        return response($Componente, 201);
     }
 
     /**
@@ -64,11 +59,8 @@ class DepartamentoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Departamento = Departamento::find($id);
-            return response($Departamento, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Componente = Componente::find($id);
+        return response($Componente, 201);
     }
 
     /**
@@ -91,13 +83,10 @@ class DepartamentoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Departamento = Departamento::find($id);
-            $Departamento->fill($request->all());
-            $Departamento->save();
-            return response($Departamento, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Componente = Componente::find($id);
+        $Componente->fill($request->all());
+        $Componente->save();
+        return response($Componente, 201);
     }
 
     /**
@@ -108,12 +97,9 @@ class DepartamentoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Departamento = Departamento::find($id);
-            $Departamento->Estado = 'INA';
-            $Departamento->save();
-            return response($Departamento, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Componente = Componente::find($id);
+        $Componente->Estado = 'INA';
+        $Componente->save();
+        return response($Componente, 201);
     }
 }

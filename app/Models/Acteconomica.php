@@ -38,6 +38,6 @@ class Acteconomica extends Eloquent
 
 	public function clasificacions()
 	{
-		return $this->hasMany(\App\Models\Clasificacion::class, 'IDActEconomia');
+		return $this->hasMany(\App\Models\Clasificacion::class, 'IDActEconomica');
 	}
 }

@@ -136,15 +136,27 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Inspeccion
 
-    $router->get('inspeccion', ["uses" => "IsnpeccionController@index"]);
-    $router->get('inspeccion/{id}', ['uses' => 'IsnpeccionController@show']);
-    $router->post('inspeccion', ['uses' => 'IsnpeccionController@store']);
-    $router->put('inspeccion/{id}', ['uses' => 'IsnpeccionController@update']);
-    $router->delete('inspeccion/{id}', ['uses' => 'IsnpeccionController@destroy']);
+    $router->get('inspeccion', ["uses" => "InspeccionController@index"]);
+    $router->get('inspeccion/{id}', ['uses' => 'InspeccionController@show']);
+    $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
+    $router->put('inspeccion/{id}', ['uses' => 'InspeccionController@update']);
+    $router->delete('inspeccion/{id}', ['uses' => 'InspeccionController@destroy']);
 
     #endregion
 
+    #region Componente
+    $router->get('componente', ["uses" => "ComponenteController@index"]);
+    $router->get('componente/{id}', ['uses' => 'ComponenteController@show']);
+    $router->post('componente', ['uses' => 'ComponenteController@store']);
+    $router->put('componente/{id}', ['uses' => 'ComponenteController@update']);
+    $router->delete('componente/{id}', ['uses' => 'ComponenteController@destroy']);
+    #endregion
 
+
+    #region TipoComponente
+    $router->get('tipocomp', ["uses" => "TipoComponenteController@index"]);
+    $router->get('tipocomp_combo', ["uses" => "TipoComponenteController@combo"]);
+    #endregion
 });
 
 

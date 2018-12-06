@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDTipoEmpresa
  * @property int $IDClasificacion
  * @property int $IDEntidad
+ * @property int $IDSector
  * @property string $Observacion
  * @property string $RUC
  * @property string $RazonSocial
@@ -46,6 +47,7 @@ class Empresa extends Eloquent
 		'IDTipoEmpresa' => 'int',
 		'IDClasificacion' => 'int',
 		'IDEntidad' => 'int',
+		'IDSector' => 'int',
 		'ObligContabilidad' => 'bool',
 		'ContEspecial' => 'bool'
 	];
@@ -55,6 +57,7 @@ class Empresa extends Eloquent
 		'IDTipoEmpresa',
 		'IDClasificacion',
 		'IDEntidad',
+		'IDSector',
 		'Observacion',
 		'RUC',
 		'RazonSocial',
@@ -82,5 +85,10 @@ class Empresa extends Eloquent
 	public function entidad()
 	{
 		return $this->belongsTo(\App\Models\Entidad::class, 'IDEntidad');
+	}
+
+	public function sector()
+	{
+		return $this->belongsTo(\App\Models\Sector::class, 'IDSector');
 	}
 }

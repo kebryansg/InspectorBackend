@@ -58,9 +58,14 @@ class EmpresaController extends Controller
         if($request->isJson()){
 //            $Empresa = Empresa::find($id);
             $Empresa = Empresa::find($id)
-                        ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
-                        ->join('ActEconomica', 'ActEconomica.ID', 'IDActEconomica')
-                        ->first([ 'Empresa.*', 'ActEconomica.ID as ActEconomica' ]);
+                ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
+                ->join('ActEconomica', 'ActEconomica.ID', 'IDActEconomica')
+                ->join('Sector', 'Sector.ID', 'IDSector')
+                ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
+                ->join('Canton', 'Canton.ID', 'IDCanton')
+                ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+                ->first([ 'Empresa.*', 'ActEconomica.ID as ActEconomica', 'Provincia.ID as Provincia', 'Canton.ID as Canton', 'Parroquia.ID as Parroquia' ]);
+
             return response($Empresa, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);

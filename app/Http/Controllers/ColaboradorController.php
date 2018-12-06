@@ -14,15 +14,12 @@ class ColaboradorController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Colaborador::join('Cargo', 'Cargo.ID', 'IDCargo')
-                ->join('Area', 'Area.ID', 'IDArea')
-                ->join('Compania', 'Compania.ID', 'IDCompania')
-                ->select(['Colaborador.*', 'Cargo.Descripcion as Cargo', 'Area.Descripcion as Area', 'Compania.Nombre as Compania'])
-                ->paginate($request->input('psize'));
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = Colaborador::join('Cargo', 'Cargo.ID', 'IDCargo')
+            ->join('Area', 'Area.ID', 'IDArea')
+            ->join('Compania', 'Compania.ID', 'IDCompania')
+            ->select(['Colaborador.*', 'Cargo.Descripcion as Cargo', 'Area.Descripcion as Area', 'Compania.Nombre as Compania'])
+            ->paginate($request->input('psize'));
+        return response($Clasificacion, 201);
     }
 
     /**
@@ -57,7 +54,11 @@ class ColaboradorController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Colaborador = Colaborador::find($id);
+//        $Colaborador = Colaborador::find($id);
+        $Colaborador = Colaborador::find($id)
+            ->join('Area', 'Area.ID', 'IDArea')
+            ->join('Departamento', 'Departamento.ID', 'IDDepartamento')
+            ->first([ 'Colaborador.*', 'Departamento.ID as Departamento' ]);
         return response($Colaborador, 201);
 
     }
@@ -82,7 +83,7 @@ class ColaboradorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $Colaborador= Colaborador::find($id);
+        $Colaborador = Colaborador::find($id);
         $Colaborador->fill($request->all());
         $Colaborador->save();
         return response($Colaborador, 201);
@@ -96,7 +97,7 @@ class ColaboradorController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $Colaborador= Colaborador::find($id);
+        $Colaborador = Colaborador::find($id);
         $Colaborador->Estado = 'INA';
         $Colaborador->save();
         return response($Colaborador, 201);
