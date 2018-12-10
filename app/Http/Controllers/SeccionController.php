@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Componente;
+use App\Models\Seccion;
 use Illuminate\Http\Request;
 
-class ComponenteController extends Controller
+class SeccionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +14,8 @@ class ComponenteController extends Controller
      */
     public function index(Request $request)
     {
-        $Componente = Componente::join('Tipocomp', 'Tipocomp.ID', 'IDTipoComp')
-            ->select([ 'Componente.*', 'Tipocomp.Descripcion as Tipocomp' ])
-            ->paginate($request->input('psize'));
-        return response($Componente, 201);
+        $Seccion = Seccion::paginate($request->input('psize'));
+        return response($Seccion, 201);
     }
 
     /**
@@ -27,8 +25,8 @@ class ComponenteController extends Controller
      */
     public function combo(Request $request)
     {
-        $Componente = Componente::where('Estado', 'ACT')->where('IDProvincia', $request->input('Provincia') )->get();
-        return response($Componente, 201);
+        $Seccion = Seccion::where('Estado', 'ACT')->get();
+        return response($Seccion, 201);
     }
 
     /**
@@ -49,8 +47,8 @@ class ComponenteController extends Controller
      */
     public function store(Request $request)
     {
-        $Componente = Componente::insertGetId($request->all());
-        return response($Componente, 201);
+        $Seccion = Seccion::insertGetId($request->all());
+        return response($Seccion, 201);
     }
 
     /**
@@ -61,8 +59,8 @@ class ComponenteController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Componente = Componente::find($id);
-        return response($Componente, 201);
+        $Seccion = Seccion::find($id);
+        return response($Seccion, 201);
     }
 
     /**
@@ -85,10 +83,10 @@ class ComponenteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $Componente = Componente::find($id);
-        $Componente->fill($request->all());
-        $Componente->save();
-        return response($Componente, 201);
+        $Seccion = Seccion::find($id);
+        $Seccion->fill($request->all());
+        $Seccion->save();
+        return response($Seccion, 201);
     }
 
     /**
@@ -99,9 +97,9 @@ class ComponenteController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $Componente = Componente::find($id);
-        $Componente->Estado = 'INA';
-        $Componente->save();
-        return response($Componente, 201);
+        $Seccion = Seccion::find($id);
+        $Seccion->Estado = 'INA';
+        $Seccion->save();
+        return response($Seccion, 201);
     }
 }

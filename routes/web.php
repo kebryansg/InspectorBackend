@@ -144,7 +144,15 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #endregion
 
-    #region Componente
+    #region Seccion
+    $router->get('seccion', ["uses" => "SeccionController@index"]);
+    $router->get('seccion/{id}', ['uses' => 'SeccionController@show']);
+    $router->post('seccion', ['uses' => 'SeccionController@store']);
+    $router->put('seccion/{id}', ['uses' => 'SeccionController@update']);
+    $router->delete('seccion/{id}', ['uses' => 'SeccionController@destroy']);
+    #endregion
+
+    ##region Componente
     $router->get('componente', ["uses" => "ComponenteController@index"]);
     $router->get('componente/{id}', ['uses' => 'ComponenteController@show']);
     $router->post('componente', ['uses' => 'ComponenteController@store']);
