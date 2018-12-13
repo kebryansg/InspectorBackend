@@ -141,11 +141,19 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
     $router->put('inspeccion/{id}', ['uses' => 'InspeccionController@update']);
     $router->delete('inspeccion/{id}', ['uses' => 'InspeccionController@destroy']);
-
     #endregion
 
-    #region Seccion
+    #region Formulario
+    $router->get('formulario', ["uses" => "FormularioController@index"]);
+    $router->get('formulario/{id}', ['uses' => 'FormularioController@show']);
+    $router->post('formulario', ['uses' => 'FormularioController@store']);
+    $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);
+    $router->delete('formulario/{id}', ['uses' => 'FormularioController@destroy']);
+    #endregion
+
+    ##region Seccion
     $router->get('seccion', ["uses" => "SeccionController@index"]);
+    $router->get('seccion_combo', ["uses" => "SeccionController@combo"]);
     $router->get('seccion/{id}', ['uses' => 'SeccionController@show']);
     $router->post('seccion', ['uses' => 'SeccionController@store']);
     $router->put('seccion/{id}', ['uses' => 'SeccionController@update']);
@@ -158,6 +166,18 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->post('componente', ['uses' => 'ComponenteController@store']);
     $router->put('componente/{id}', ['uses' => 'ComponenteController@update']);
     $router->delete('componente/{id}', ['uses' => 'ComponenteController@destroy']);
+    #endregion
+
+    #region Seccion-Componente
+    $router->get('components/seccion/', ["uses" => "ComponenteController@componente_secion"]);
+    $router->get('seccions/components/', ["uses" => "ComponenteController@componente_secioncomponent"]);
+    $router->post('components/seccion/{id}', ["uses" => "ComponenteController@componente_secion_store"]);
+    #endregion
+
+    #region Formulario-Seccion
+    $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
+    $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
+    $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);
     #endregion
 
 

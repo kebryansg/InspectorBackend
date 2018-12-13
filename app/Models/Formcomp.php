@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * 
  * @property int $ID
  * @property int $IDFormulario
- * @property int $IDSubComponente
+ * @property int $IDSeccionComponente
  * @property string $Atributo
  * @property int $Obligatorio
  * @property string $Estado
@@ -31,13 +31,13 @@ class Formcomp extends Eloquent
 
 	protected $casts = [
 		'IDFormulario' => 'int',
-		'IDSubComponente' => 'int',
+		'IDSeccionComponente' => 'int',
 		'Obligatorio' => 'int'
 	];
 
 	protected $fillable = [
 		'IDFormulario',
-		'IDSubComponente',
+		'IDSeccionComponente',
 		'Atributo',
 		'Obligatorio',
 		'Estado'
@@ -47,4 +47,5 @@ class Formcomp extends Eloquent
 	{
 		return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
 	}
+
 }

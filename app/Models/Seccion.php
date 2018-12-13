@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Observacion
  * @property string $Estado
  * 
- * @property \Illuminate\Database\Eloquent\Collection $componentes
+ * @property \Illuminate\Database\Eloquent\Collection $seccioncomponentes
  *
  * @package App\Models
  */
@@ -33,8 +33,8 @@ class Seccion extends Eloquent
 		'Estado'
 	];
 
-	public function componentes()
-	{
-		return $this->hasMany(\App\Models\Componente::class, 'IDSeccion');
-	}
+    public function seccioncomponentes()
+    {
+        return $this->hasMany(\App\Models\SeccionComponente::class, 'IDSeccion');
+    }
 }

@@ -102,4 +102,19 @@ class SeccionController extends Controller
         $Seccion->save();
         return response($Seccion, 201);
     }
+
+
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function secion_formulario_store(Request $request, $id)
+    {
+        SeccionComponente::where('IDSeccion', $id)->delete();
+        SeccionComponente::insert($request->all());
+        return response('true', 201);
+    }
+
 }

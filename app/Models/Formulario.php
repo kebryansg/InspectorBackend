@@ -13,11 +13,13 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Formulario
  * 
  * @property int $ID
- * @property \Carbon\Carbon $FechaRegistro
+ * @property int $IDUsers_created
+ * @property int $IDUsers_updated
  * @property string $Descripcion
+ * @property string $Observacion
  * @property string $Estado
  * 
- * @property \Illuminate\Database\Eloquent\Collection $componentes
+ * @property \Illuminate\Database\Eloquent\Collection $formcomps
  *
  * @package App\Models
  */
@@ -25,25 +27,21 @@ class Formulario extends Eloquent
 {
 	protected $table = 'formulario';
 	protected $primaryKey = 'ID';
-	public $incrementing = false;
-	public $timestamps = false;
 
 	protected $casts = [
-		'ID' => 'int'
-	];
-
-	protected $dates = [
-		'FechaRegistro'
+		'ID' => 'int',
+		'IDUsers_created' => 'int',
+		'IDUsers_updated' => 'int',
 	];
 
 	protected $fillable = [
-		'FechaRegistro',
 		'Descripcion',
+		'Observacion',
 		'Estado'
 	];
 
-	public function componentes()
+	public function formcomps()
 	{
-		return $this->hasMany(\App\Models\Componente::class, 'IDFormulario');
+		return $this->hasMany(\App\Models\Formcomp::class, 'IDFormulario');
 	}
 }
