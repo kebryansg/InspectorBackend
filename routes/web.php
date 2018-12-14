@@ -145,7 +145,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Formulario
     $router->get('formulario', ["uses" => "FormularioController@index"]);
-    $router->get('formulario/{id}', ['uses' => 'FormularioController@show']);
+    $router->get('formulario/{id}/', ['uses' => 'FormularioController@show']);
     $router->post('formulario', ['uses' => 'FormularioController@store']);
     $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);
     $router->delete('formulario/{id}', ['uses' => 'FormularioController@destroy']);
@@ -175,6 +175,8 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #endregion
 
     #region Formulario-Seccion
+    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
+    $router->post('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_store"]);
     $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
     $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
     $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);

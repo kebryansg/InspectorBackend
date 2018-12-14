@@ -12,7 +12,7 @@ class ClasificacionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( Request $request )
+    public function index(Request $request)
     {
         if ($request->isJson()) {
             $Clasificacion = Clasificacion::paginate($request->input('psize'));
@@ -26,10 +26,10 @@ class ClasificacionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function combo( Request $request )
+    public function combo(Request $request)
     {
         if ($request->isJson()) {
-            $Clasificacion = Clasificacion::where('Estado', 'ACT')->where('IDActEconomica', $request->input('ActEconomica') )->get();
+            $Clasificacion = Clasificacion::where('Estado', 'ACT')->where('IDActEconomica', $request->input('ActEconomica'))->get();
             return response($Clasificacion, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -48,39 +48,33 @@ class ClasificacionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Clasificacion = new Clasificacion();
-            $Clasificacion->fill($request->all());
-            $Clasificacion->save();
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = new Clasificacion();
+        $Clasificacion->fill($request->all());
+        $Clasificacion->save();
+        return response($Clasificacion, 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Clasificacion::find($id);
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = Clasificacion::find($id);
+        return response($Clasificacion, 201);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -91,25 +85,22 @@ class ClasificacionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Clasificacion::find($id);
-            $Clasificacion->fill($request->all());
-            $Clasificacion->save();
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = Clasificacion::find($id);
+        $Clasificacion->fill($request->all());
+        $Clasificacion->save();
+        return response($Clasificacion, 201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)

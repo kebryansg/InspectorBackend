@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * 
  * @property int $ID
  * @property string $Descripcion
+ * @property float $Precio
  * @property string $Estado
  * @property int $IDActEconomia
  * 
@@ -31,11 +32,13 @@ class Clasificacion extends Eloquent
 
 	protected $casts = [
 		'ID' => 'int',
+        'Precio' => 'float',
 		'IDActEconomica' => 'int'
 	];
 
 	protected $fillable = [
 		'Descripcion',
+        'Precio',
 		'Estado',
 		'IDActEconomica'
 	];

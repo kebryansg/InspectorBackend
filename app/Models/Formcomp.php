@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Estado
  * 
  * @property \App\Models\Formulario $formulario
+ * @property \App\Models\Seccioncomponente $seccioncomponente
  *
  * @package App\Models
  */
@@ -32,7 +33,8 @@ class Formcomp extends Eloquent
 	protected $casts = [
 		'IDFormulario' => 'int',
 		'IDSeccionComponente' => 'int',
-		'Obligatorio' => 'int'
+		'Obligatorio' => 'int',
+        'Atributo' => 'array'
 	];
 
 	protected $fillable = [
@@ -48,4 +50,8 @@ class Formcomp extends Eloquent
 		return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
 	}
 
+    public function seccioncomponente()
+    {
+        return $this->belongsTo(\App\Models\Seccioncomponente::class, 'IDSeccionComponente');
+    }
 }

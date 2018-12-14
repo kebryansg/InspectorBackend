@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Estado
  * 
  * @property \Illuminate\Database\Eloquent\Collection $seccioncomponentes
+ * @property \Illuminate\Database\Eloquent\Collection $componentes
  *
  * @package App\Models
  */
@@ -37,4 +38,11 @@ class Seccion extends Eloquent
     {
         return $this->hasMany(\App\Models\SeccionComponente::class, 'IDSeccion');
     }
+
+    public function componentes()
+    {
+        return $this->belongsToMany(\App\Models\Componente::class, 'seccioncomponente', 'IDSeccion', 'IDComponente')
+            ->withPivot('ID', 'Estado');
+    }
+
 }
