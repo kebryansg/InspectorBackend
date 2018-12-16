@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Acteconomica;
+use App\Models\Tipoacteconomica;
 use Illuminate\Http\Request;
 
-class ActividadEconomicaController extends Controller
+class TipoActEconomicaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +14,10 @@ class ActividadEconomicaController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::where('Estado', 'ACT')->paginate($request->input('psize'));
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Tipoempresas = Tipoacteconomica::join('Acteconomica', 'Acteconomica.ID', 'IDActEconomica')
+            ->select([ 'Tipoacteconomica.*', 'Acteconomica.Descripcion as ActEconomica' ])
+            ->paginate($request->input('psize'));
+        return response($Tipoempresas, 201);
     }
 
     /**
@@ -28,8 +27,8 @@ class ActividadEconomicaController extends Controller
      */
     public function combo(Request $request)
     {
-        $Acteconomica = Acteconomica::with('tipoacteconomicas')->where('Estado', 'ACT')->get();
-        return response($Acteconomica, 201);
+        $Tipoempresas = Tipoacteconomica::where('Estado', 'ACT')->get();
+        return response($Tipoempresas, 201);
     }
 
     /**
@@ -50,13 +49,10 @@ class ActividadEconomicaController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Acteconomica = new Acteconomica();
-            $Acteconomica->fill($request->all());
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Tipoempresa = new Tipoacteconomica();
+        $Tipoempresa->fill($request->all());
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -67,11 +63,8 @@ class ActividadEconomicaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Tipoempresa = Tipoacteconomica::find($id);
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -94,13 +87,10 @@ class ActividadEconomicaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            $Acteconomica->fill($request->all());
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Tipoempresa = Tipoacteconomica::find($id);
+        $Tipoempresa->fill($request->all());
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -111,12 +101,9 @@ class ActividadEconomicaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            $Acteconomica->Estado = 'INA';
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Tipoempresa = Tipoacteconomica::find($id);
+        $Tipoempresa->Estado = 'INA';
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 }

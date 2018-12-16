@@ -35,12 +35,12 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->post('compania', ['uses' => 'CompaniaController@store']);
     $router->get('compania_combo', ['uses' => 'CompaniaController@combo']);
 
-    $router->get('tipoempresa', ["uses" => "TipoEmpresaController@index"]);
-    $router->get('tipoempresa_combo', ["uses" => "TipoEmpresaController@combo"]);
-    $router->get('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@show']);
-    $router->post('tipoempresa', ['uses' => 'TipoEmpresaController@store']);
-    $router->put('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@update']);
-    $router->delete('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@destroy']);
+    $router->get('tipoact', ["uses" => "TipoActEconomicaController@index"]);
+    $router->get('tipoact_combo', ["uses" => "TipoActEconomicaController@combo"]);
+    $router->get('tipoact/{id}', ['uses' => 'TipoActEconomicaController@show']);
+    $router->post('tipoact', ['uses' => 'TipoActEconomicaController@store']);
+    $router->put('tipoact/{id}', ['uses' => 'TipoActEconomicaController@update']);
+    $router->delete('tipoact/{id}', ['uses' => 'TipoActEconomicaController@destroy']);
 
     $router->get('empresa', ["uses" => "EmpresaController@index"]);
     $router->get('empresa/{id}', ['uses' => 'EmpresaController@show']);
@@ -50,6 +50,8 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     $router->get('clasificacion', ["uses" => "ClasificacionController@index"]);
     $router->get('clasificacion_combo', ["uses" => "ClasificacionController@combo"]);
+    $router->get('clasificacion_ls_asign', ["uses" => "ClasificacionController@listAsignFormulario"]);
+    $router->post('clasificacion_ls_asign/{form}/', ["uses" => "ClasificacionController@store_listAsignFormulario"]);
     $router->get('clasificacion/{id}', ['uses' => 'ClasificacionController@show']);
     $router->post('clasificacion', ['uses' => 'ClasificacionController@store']);
     $router->put('clasificacion/{id}', ['uses' => 'ClasificacionController@update']);
@@ -145,6 +147,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Formulario
     $router->get('formulario', ["uses" => "FormularioController@index"]);
+    $router->get('formulario_combo', ["uses" => "FormularioController@combo"]);
     $router->get('formulario/{id}/', ['uses' => 'FormularioController@show']);
     $router->post('formulario', ['uses' => 'FormularioController@store']);
     $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);

@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Fri, 09 Nov 2018 17:31:37 +0000.
+ * Date: Sat, 15 Dec 2018 04:36:22 +0000.
  */
 
 namespace App\Models;
@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * 
  * @property int $ID
  * @property string $Descripcion
- * @property int $IDTipoEmpresa
  * @property int $IDClasificacion
  * @property int $IDEntidad
  * @property int $IDSector
@@ -31,9 +30,10 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Email
  * @property string $Estado
  * 
- * @property \App\Models\Clasificacion $clasificacion
- * @property \App\Models\Tipoempresa $tipoempresa
  * @property \App\Models\Entidad $entidad
+ * @property \App\Models\Clasificacion $clasificacion
+ * @property \App\Models\Sector $sector
+ * @property \Illuminate\Database\Eloquent\Collection $inspeccions
  *
  * @package App\Models
  */
@@ -44,7 +44,6 @@ class Empresa extends Eloquent
 	public $timestamps = false;
 
 	protected $casts = [
-		'IDTipoEmpresa' => 'int',
 		'IDClasificacion' => 'int',
 		'IDEntidad' => 'int',
 		'IDSector' => 'int',
@@ -54,7 +53,6 @@ class Empresa extends Eloquent
 
 	protected $fillable = [
 		'Descripcion',
-		'IDTipoEmpresa',
 		'IDClasificacion',
 		'IDEntidad',
 		'IDSector',
@@ -72,23 +70,23 @@ class Empresa extends Eloquent
 		'Estado'
 	];
 
-	public function clasificacion()
-	{
-		return $this->belongsTo(\App\Models\Clasificacion::class, 'IDClasificacion');
-	}
-
-	public function tipoempresa()
-	{
-		return $this->belongsTo(\App\Models\Tipoempresa::class, 'IDTipoEmpresa');
-	}
-
 	public function entidad()
 	{
 		return $this->belongsTo(\App\Models\Entidad::class, 'IDEntidad');
 	}
 
+	public function clasificacion()
+	{
+		return $this->belongsTo(\App\Models\Clasificacion::class, 'IDClasificacion');
+	}
+
 	public function sector()
 	{
 		return $this->belongsTo(\App\Models\Sector::class, 'IDSector');
+	}
+
+	public function inspeccions()
+	{
+		return $this->hasMany(\App\Models\Inspeccion::class, 'IDEmpresa');
 	}
 }

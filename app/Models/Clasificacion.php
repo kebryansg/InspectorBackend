@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Sat, 15 Dec 2018 04:36:22 +0000.
  */
 
 namespace App\Models;
@@ -16,9 +16,10 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Descripcion
  * @property float $Precio
  * @property string $Estado
- * @property int $IDActEconomia
- * 
- * @property \App\Models\Acteconomica $acteconomica
+ * @property int $IDTipoActEcon
+ * @property int $IDFormulario
+ *
+ * @property \App\Models\Tipoacteconomica $tipoacteconomica
  * @property \Illuminate\Database\Eloquent\Collection $empresas
  *
  * @package App\Models
@@ -27,25 +28,25 @@ class Clasificacion extends Eloquent
 {
 	protected $table = 'clasificacion';
 	protected $primaryKey = 'ID';
-	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'ID' => 'int',
-        'Precio' => 'float',
-		'IDActEconomica' => 'int'
+		'Precio' => 'float',
+		'IDTipoActEcon' => 'int',
+		'IDFormulario' => 'int'
 	];
 
 	protected $fillable = [
 		'Descripcion',
-        'Precio',
+		'Precio',
 		'Estado',
-		'IDActEconomica'
+		'IDTipoActEcon',
+		'IDFormulario'
 	];
 
-	public function acteconomica()
+	public function tipoacteconomica()
 	{
-		return $this->belongsTo(\App\Models\Acteconomica::class, 'IDActEconomica');
+		return $this->belongsTo(\App\Models\Tipoacteconomica::class, 'IDTipoActEcon');
 	}
 
 	public function empresas()

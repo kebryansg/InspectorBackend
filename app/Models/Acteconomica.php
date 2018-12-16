@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Sat, 15 Dec 2018 04:36:22 +0000.
  */
 
 namespace App\Models;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Descripcion
  * @property string $Estado
  * 
- * @property \Illuminate\Database\Eloquent\Collection $clasificacions
+ * @property \Illuminate\Database\Eloquent\Collection $tipoacteconomicas
  *
  * @package App\Models
  */
@@ -24,20 +24,15 @@ class Acteconomica extends Eloquent
 {
 	protected $table = 'acteconomica';
 	protected $primaryKey = 'ID';
-	public $incrementing = false;
 	public $timestamps = false;
-
-	protected $casts = [
-		'ID' => 'int'
-	];
 
 	protected $fillable = [
 		'Descripcion',
 		'Estado'
 	];
 
-	public function clasificacions()
+	public function tipoacteconomicas()
 	{
-		return $this->hasMany(\App\Models\Clasificacion::class, 'IDActEconomica');
+		return $this->hasMany(\App\Models\Tipoacteconomica::class, 'IDActEconomica');
 	}
 }

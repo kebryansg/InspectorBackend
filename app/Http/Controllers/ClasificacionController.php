@@ -14,11 +14,46 @@ class ClasificacionController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Clasificacion::paginate($request->input('psize'));
-            return response($Clasificacion, 201);
+        $Clasificacion = Clasificacion::join('TipoActEconomica', 'TipoActEconomica.ID', 'IDTipoActEcon')
+            ->join('Acteconomica', 'Acteconomica.ID', 'TipoActEconomica.IDActEconomica')
+            ->select(['Clasificacion.*', 'TipoActEconomica.Descripcion as TipoActEconomica', 'Acteconomica.Descripcion as ActEconomica'])
+            ->paginate($request->input('psize'));
+        return response($Clasificacion, 201);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function listAsignFormulario(Request $request)
+    {
+        $query = Clasificacion::join('TipoActEconomica', 'TipoActEconomica.ID', 'IDTipoActEcon')
+            ->join('Acteconomica', 'Acteconomica.ID', 'TipoActEconomica.IDActEconomica')
+            ->leftJoin('Formulario', 'Formulario.ID', 'Clasificacion.IDFormulario');
+
+        if ($request->input('IDActEconomica')) {
+            $query = $query->where('Acteconomica.ID', $request->input('IDActEconomica'));
         }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        if ($request->input('IDTipoActEconomica')) {
+            $query = $query->where('TipoActEconomica.ID', $request->input('IDTipoActEconomica'));
+        }
+        $Clasificacion = $query->get(['Clasificacion.ID', 'Clasificacion.IDTipoActEcon', 'Clasificacion.Descripcion as Clasificacion', 'TipoActEconomica.Descripcion as Categoria', 'Acteconomica.Descripcion as ActEconomica', 'Formulario.Descripcion as Formulario']);
+        return response($Clasificacion, 201);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function store_listAsignFormulario(Request $request, $form)
+    {
+        $result = Clasificacion::whereIn('ID', $request->all())
+            ->update([
+                "IDFormulario" => $form
+            ]);
+        return response($result, 201);
     }
 
     /**
@@ -28,11 +63,8 @@ class ClasificacionController extends Controller
      */
     public function combo(Request $request)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Clasificacion::where('Estado', 'ACT')->where('IDActEconomica', $request->input('ActEconomica'))->get();
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = Clasificacion::where('Estado', 'ACT')->where('IDActEconomica', $request->input('ActEconomica'))->get();
+        return response($Clasificacion, 201);
     }
 
     /**
@@ -67,7 +99,11 @@ class ClasificacionController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Clasificacion = Clasificacion::find($id);
+        $Clasificacion = Clasificacion::join('TipoActEconomica', 'TipoActEconomica.ID', 'IDTipoActEcon')
+            ->join('Acteconomica', 'Acteconomica.ID', 'TipoActEconomica.IDActEconomica')
+            ->where('Clasificacion.ID', $id)
+            ->first(['Clasificacion.*', 'Acteconomica.ID as IDActEconomica']);
+
         return response($Clasificacion, 201);
     }
 
@@ -105,12 +141,9 @@ class ClasificacionController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Clasificacion = Clasificacion::find($id);
-            $Clasificacion->Estado = 'INA';
-            $Clasificacion->save();
-            return response($Clasificacion, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Clasificacion = Clasificacion::find($id);
+        $Clasificacion->Estado = 'INA';
+        $Clasificacion->save();
+        return response($Clasificacion, 201);
     }
 }
