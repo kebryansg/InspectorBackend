@@ -14,11 +14,8 @@ class ActividadEconomicaController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::where('Estado', 'ACT')->paginate($request->input('psize'));
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = Acteconomica::where('Estado', 'ACT')->paginate($request->input('psize'));
+        return response($Acteconomica, 201);
     }
 
     /**
@@ -28,7 +25,7 @@ class ActividadEconomicaController extends Controller
      */
     public function combo(Request $request)
     {
-        $Acteconomica = Acteconomica::with('tipoacteconomicas')->where('Estado', 'ACT')->get();
+        $Acteconomica = Acteconomica::with('tipoacteconomicas.clasificacions')->where('Estado', 'ACT')->get();
         return response($Acteconomica, 201);
     }
 
@@ -50,13 +47,10 @@ class ActividadEconomicaController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Acteconomica = new Acteconomica();
-            $Acteconomica->fill($request->all());
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = new Acteconomica();
+        $Acteconomica->fill($request->all());
+        $Acteconomica->save();
+        return response($Acteconomica, 201);
     }
 
     /**
@@ -67,11 +61,8 @@ class ActividadEconomicaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = Acteconomica::find($id);
+        return response($Acteconomica, 201);
     }
 
     /**
@@ -94,13 +85,10 @@ class ActividadEconomicaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            $Acteconomica->fill($request->all());
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = Acteconomica::find($id);
+        $Acteconomica->fill($request->all());
+        $Acteconomica->save();
+        return response($Acteconomica, 201);
     }
 
     /**
@@ -111,12 +99,9 @@ class ActividadEconomicaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Acteconomica = Acteconomica::find($id);
-            $Acteconomica->Estado = 'INA';
-            $Acteconomica->save();
-            return response($Acteconomica, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Acteconomica = Acteconomica::find($id);
+        $Acteconomica->Estado = 'INA';
+        $Acteconomica->save();
+        return response($Acteconomica, 201);
     }
 }

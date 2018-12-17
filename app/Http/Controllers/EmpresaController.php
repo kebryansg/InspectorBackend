@@ -12,9 +12,9 @@ class EmpresaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( Request $request )
+    public function index(Request $request)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Empresas = Empresa::where('Estado', 'ACT')->paginate($request->input('psize'));
             return response($Empresas, 201);
         }
@@ -34,14 +34,14 @@ class EmpresaController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        if($request->isJson()){
+        if ($request->isJson()) {
             $Empresa = new Empresa();
-            $Empresa->fill( $request->all() );
+            $Empresa->fill($request->all());
             $Empresa->save();
             return response($Empresa, 201);
         }
@@ -50,31 +50,28 @@ class EmpresaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show( Request $request, $id )
+    public function show(Request $request, $id)
     {
-        if($request->isJson()){
-//            $Empresa = Empresa::find($id);
-            $Empresa = Empresa::find($id)
-                ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
-                ->join('ActEconomica', 'ActEconomica.ID', 'IDActEconomica')
-                ->join('Sector', 'Sector.ID', 'IDSector')
-                ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
-                ->join('Canton', 'Canton.ID', 'IDCanton')
-                ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
-                ->first([ 'Empresa.*', 'ActEconomica.ID as ActEconomica', 'Provincia.ID as Provincia', 'Canton.ID as Canton', 'Parroquia.ID as Parroquia' ]);
+        $Empresa = Empresa::find($id)
+            ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
+            ->join('TipoActEconomica', 'TipoActEconomica.ID', 'Clasificacion.IDTipoActEcon')
+            ->join('ActEconomica', 'ActEconomica.ID', 'TipoActEconomica.IDActEconomica')
+            ->join('Sector', 'Sector.ID', 'IDSector')
+            ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
+            ->join('Canton', 'Canton.ID', 'IDCanton')
+            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
 
-            return response($Empresa, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        return response($Empresa, 201);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -85,35 +82,30 @@ class EmpresaController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        if($request->isJson()){
-            $Empresa = Empresa::find($id);
-            $Empresa->fill( $request->all() );
-            $Empresa->save();
-            return response($Empresa, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+
+        $Empresa = Empresa::find($id);
+        $Empresa->fill($request->all());
+        $Empresa->save();
+        return response($Empresa, 201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
     {
-        if($request->isJson()){
-            $Empresa= Empresa::find($id);
-            $Empresa->Estado = 'INA';
-            $Empresa->save();
-            return response($Empresa, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Empresa = Empresa::find($id);
+        $Empresa->Estado = 'INA';
+        $Empresa->save();
+        return response($Empresa, 201);
     }
 }

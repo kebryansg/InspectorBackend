@@ -29,7 +29,9 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Celular
  * @property string $Email
  * @property string $Estado
- * 
+ * @property string $Latitud
+ * @property string $Longitud
+ *
  * @property \App\Models\Entidad $entidad
  * @property \App\Models\Clasificacion $clasificacion
  * @property \App\Models\Sector $sector
