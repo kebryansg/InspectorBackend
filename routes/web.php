@@ -1,15 +1,8 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+//date_default_timezone_set('America/Guayaquil');
+
+use Illuminate\Support\Facades\DB;
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -93,7 +86,8 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->delete('cargo/{id}', ['uses' => 'CargoController@destroy']);
 
     $router->get('colaborador', ["uses" => "ColaboradorController@index"]);
-    $router->get('colaborador/{id}', ['uses' => 'ColaboradorController@show']);
+    $router->get('colaborador/{id}/', ['uses' => 'ColaboradorController@show']);
+    $router->get('colaborador_inspector/', ['uses' => 'ColaboradorController@inspectores']);
     $router->post('colaborador', ['uses' => 'ColaboradorController@store']);
     $router->put('colaborador/{id}', ['uses' => 'ColaboradorController@update']);
     $router->delete('colaborador/{id}', ['uses' => 'ColaboradorController@destroy']);
@@ -139,10 +133,11 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Inspeccion
 
     $router->get('inspeccion', ["uses" => "InspeccionController@index"]);
-    $router->get('inspeccion/{id}', ['uses' => 'InspeccionController@show']);
+    $router->get('inspeccion/{id}/', ['uses' => 'InspeccionController@show']);
     $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
-    $router->put('inspeccion/{id}', ['uses' => 'InspeccionController@update']);
-    $router->delete('inspeccion/{id}', ['uses' => 'InspeccionController@destroy']);
+    $router->put('inspeccion/{id}/', ['uses' => 'InspeccionController@update']);
+    $router->delete('inspeccion/{id}/', ['uses' => 'InspeccionController@destroy']);
+    $router->put('inspeccion/{id}/coladorador/{colaborador}/', ['uses' => 'InspeccionController@inspeccion_colaborador']);
     #endregion
 
     #region Formulario
@@ -178,7 +173,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #endregion
 
     #region Formulario-Seccion
-    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
+//    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
     $router->post('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_store"]);
     $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
     $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
@@ -193,4 +188,27 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 });
 
 
+$router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
+
+$router->get('firebase/', function () {
+    return Firebase::get('/colaborador', ['print' => 'pretty']);
+//    return response()->json($data,201);
+});
+
+$router->post('firebase/', function () {
+    $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
+        ->get();
+
+    foreach ($colaboradors as $Colaborador){
+//        $key = $colaborador->created_at->getTimestamp();
+        Firebase::set('/colaborador/colb_'. $Colaborador->ID, [
+            'ID' => $Colaborador->ID,
+            'Cedula' => $Colaborador->Cedula,
+            'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
+            'Created_at' => $Colaborador->created_at->getTimestamp(),
+            'Updated_at' => $Colaborador->updated_at->getTimestamp()
+        ]);
+    }
+    return $colaboradors;
+});

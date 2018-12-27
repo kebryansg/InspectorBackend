@@ -14,11 +14,15 @@ class EmpresaController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Empresas = Empresa::where('Estado', 'ACT')->paginate($request->input('psize'));
-            return response($Empresas, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Empresas = Empresa::with('clasificacion.tipoacteconomica', 'sector')
+            ->where('Estado', 'ACT')
+            ->where([
+                ['RUC', 'like', '%' . $request->input('search') . '%'],
+                ['RazonSocial', 'like', '%' . $request->input('search') . '%'],
+                ['NombreComercial', 'like', '%' . $request->input('search') . '%'],
+            ])
+            ->paginate($request->input('psize'));
+        return response($Empresas, 201);
     }
 
     /**

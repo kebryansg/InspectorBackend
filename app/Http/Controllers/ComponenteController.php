@@ -60,7 +60,7 @@ class ComponenteController extends Controller
     {
         $Componente = Componente::leftJoin('SeccionComponente', 'SeccionComponente.IDComponente', 'Componente.ID')
             ->where('Componente.Estado', 'ACT')
-            ->get(['Componente.*', 'SeccionComponente.IDSeccion']);
+            ->get(['Componente.*', 'SeccionComponente.IDSeccion', 'SeccionComponente.Estado as SEstado']);
         return response($Componente, 201);
     }
 
@@ -75,25 +75,34 @@ class ComponenteController extends Controller
         $rows = $request->all();
         $ids = $Seccion->seccioncomponentes->pluck('IDComponente')->toArray();
 
+        $idsNew = array_diff($rows, $ids);
         $Seccion->seccioncomponentes()->createMany(array_map(function ($item) {
             return [
                 'IDComponente' => $item
             ];
-        }, array_diff($rows, $ids)));
+        }, $idsNew));
+
+
+        // Update Anteriores
+
+        $idsIntersect = array_intersect($rows, $ids);
+        SeccionComponente::where('IDSeccion', $id)
+            ->whereIn('IDComponente', $idsIntersect)
+            ->update([ 'Estado' => 'ACT' ]);
 
         // Eliminar ids que no se encontraron
-        $ids_delete = [];
-        foreach (array_diff($ids, $rows) as $item){
-            $ids_delete[]= $item;
-        }
-
-        if (count($ids_delete)) {
+        $idsDelete = array_values(array_diff($ids, $rows));
+        if (count($idsDelete)) {
             SeccionComponente::where('IDSeccion', $id)
-                ->whereRaw('IDComponente in (?)', [$ids_delete])
+                ->whereIn('IDComponente', $idsDelete)
                 ->update([ 'Estado' => 'INA' ]);
         }
 
-        return response($ids, 201);
+        return response([
+            "nuevos" =>  $idsNew,
+            "intersect" => $idsIntersect,
+            "delete" => $idsDelete
+        ], 201);
     }
 
     /**

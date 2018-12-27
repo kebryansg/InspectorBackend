@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDCompania
  * @property int $IDCargo
  * @property int $IDArea
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  * 
  * @property \App\Models\Cargo $cargo
  * @property \App\Models\Area $area
@@ -33,7 +35,7 @@ class Colaborador extends Eloquent
 {
 	protected $table = 'colaborador';
 	protected $primaryKey = 'ID';
-	public $timestamps = false;
+//	public $timestamps = false;
 
 	protected $casts = [
 		'IDCompania' => 'int',

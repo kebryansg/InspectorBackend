@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67b73c5dc4d18df3e18976251c4f2127",
+    "content-hash": "5a8ca180e220b2540b9b366870659062",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -1793,6 +1793,48 @@
             "time": "2018-09-29T18:48:56+00:00"
         },
         {
+            "name": "ktamas77/firebase-php",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ktamas77/firebase-php.git",
+                "reference": "915fcac8a3e4e1ba457ab0cd0801255ce41445c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ktamas77/firebase-php/zipball/915fcac8a3e4e1ba457ab0cd0801255ce41445c5",
+                "reference": "915fcac8a3e4e1ba457ab0cd0801255ce41445c5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tamas Kalman",
+                    "email": "ktamas77@gmail.com"
+                }
+            ],
+            "description": "Firebase PHP Client",
+            "homepage": "https://github.com/ktamas77/firebase-php",
+            "keywords": [
+                "firebase",
+                "rest",
+                "wrapper"
+            ],
+            "time": "2016-06-14T20:11:14+00:00"
+        },
+        {
             "name": "laravel/lumen-framework",
             "version": "v5.7.1",
             "source": {
@@ -2817,6 +2859,57 @@
                 "shell"
             ],
             "time": "2018-10-13T15:16:03+00:00"
+        },
+        {
+            "name": "safestudio/firebase-laravel",
+            "version": "1.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SafeStudio/firebase-laravel.git",
+                "reference": "6210c3d9bdf732068a4341486f0577396afd4421"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SafeStudio/firebase-laravel/zipball/6210c3d9bdf732068a4341486f0577396afd4421",
+                "reference": "6210c3d9bdf732068a4341486f0577396afd4421",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^5.4",
+                "ktamas77/firebase-php": "^2.2",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.4",
+                "phpunit/phpunit": "^6.3",
+                "vlucas/phpdotenv": "2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SafeStudio\\Firebase\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Le Minh Tri",
+                    "email": "ansidev@gmail.com"
+                }
+            ],
+            "description": "Firebase REST API easy wrapper for Laravel",
+            "keywords": [
+                "api",
+                "firebase",
+                "framework",
+                "laravel",
+                "rest",
+                "wrapper"
+            ],
+            "time": "2017-08-22T22:00:48+00:00"
         },
         {
             "name": "symfony/console",

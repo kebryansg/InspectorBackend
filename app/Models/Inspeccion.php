@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Wed, 21 Nov 2018 02:33:41 +0000.
+ * Date: Mon, 17 Dec 2018 23:27:27 +0000.
  */
 
 namespace App\Models;
@@ -13,50 +13,69 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Inspeccion
  * 
  * @property int $ID
+ * @property \Carbon\Carbon $FechaInspeccion
+ * @property \Carbon\Carbon $FechaTentativa
  * @property string $Estado
  * @property int $IDFormulario
  * @property int $IDEmpresa
  * @property int $IDColaborador
- * @property \Carbon\Carbon $FechaRegistro
- * @property int $UsuarioRegistro
- * @property \Carbon\Carbon $FechaInspeccion
  * @property string $Observacion
+ * @property int $UsuarioRegistro
+ * @property int $UsuarioUpdate
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  * 
  * @property \App\Models\Empresa $empresa
+ * @property \App\Models\Colaborador $colaborador
+ * @property \App\Models\Formulario $formulario
  *
  * @package App\Models
  */
 class Inspeccion extends Eloquent
 {
-	protected $table = 'inspeccion';
-	protected $primaryKey = 'ID';
-	public $timestamps = false;
+    protected $table = 'inspeccion';
+    protected $primaryKey = 'ID';
+//    protected $dateFormat = 'Y-m-d\TH:i:s+';
 
-	protected $casts = [
+    protected $casts = [
 		'IDFormulario' => 'int',
 		'IDEmpresa' => 'int',
 		'IDColaborador' => 'int',
-		'UsuarioRegistro' => 'int'
+		'UsuarioRegistro' => 'int',
+		'UsuarioUpdate' => 'int'
 	];
 
 	protected $dates = [
-		'FechaRegistro',
-		'FechaInspeccion'
+		'FechaInspeccion' ,
+        'created_at',
+        'updated_at',
+		'FechaTentativa' => 'Y-m-d\TH:i:s+'
 	];
 
 	protected $fillable = [
+		'FechaInspeccion',
+		'FechaTentativa',
 		'Estado',
 		'IDFormulario',
 		'IDEmpresa',
 		'IDColaborador',
-		'FechaRegistro',
+		'Observacion',
 		'UsuarioRegistro',
-		'FechaInspeccion',
-		'Observacion'
+		'UsuarioUpdate'
 	];
 
 	public function empresa()
 	{
 		return $this->belongsTo(\App\Models\Empresa::class, 'IDEmpresa');
+	}
+
+	public function colaborador()
+	{
+		return $this->belongsTo(\App\Models\Colaborador::class, 'IDColaborador');
+	}
+
+	public function formulario()
+	{
+		return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
 	}
 }

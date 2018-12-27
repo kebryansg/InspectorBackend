@@ -93,6 +93,10 @@ $app->routeMiddleware([
 // Lumen Generator
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
+// Firebase
+$app->register(SafeStudio\Firebase\FirebaseServiceProvider::class);
+class_alias(SafeStudio\Firebase\Facades\FirebaseFacades::class, 'Firebase');
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
@@ -116,6 +120,7 @@ $app->register(Laravel\Passport\PassportServiceProvider::class);
 $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 $app->configure('auth');
+$app->configure('services');
 
 
 return $app;
