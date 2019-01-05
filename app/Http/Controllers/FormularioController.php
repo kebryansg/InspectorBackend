@@ -8,6 +8,7 @@ use App\Models\Formulario;
 use App\Models\Seccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FormularioController extends Controller
 {
@@ -120,39 +121,23 @@ class FormularioController extends Controller
      */
     public function seccion_formulario_full(Request $request, $form)
     {
-        $Seccions = Formulario::join('FormComp', 'FormComp.IDFormulario', 'Formulario.ID')
-            ->join('SeccionComponente', 'SeccionComponente.ID', 'FormComp.IDSeccionComponente')
-            ->join('Seccion', 'Seccion.ID', 'SeccionComponente.IDSeccion')
-            ->where('Formulario.ID', $form)
-            ->where('Seccion.Estado', 'ACT')
-            ->groupby('Seccion.ID')
-            ->get(['Seccion.*']);
+        $Seccions = Seccion::with(['componentes' => function ($query) {
+            return $query->where('Estado', 'ACT');
+        }])
+            ->where('IDFormulario', $form)
+            ->where('Estado', 'ACT')
+            ->get();
+        return response()->json($Seccions, 200);
+    }
 
-
-//        $components = Componente::join('SeccionComponente', 'SeccionComponente.IDComponente', 'Componente.ID')
-//            ->join('FormComp', 'FormComp.IDSeccionComponente', 'SeccionComponente.ID')
-//            ->join('TipoComp', 'Componente.IDTipoComp', 'TipoComp.ID')
-//            ->where('FormComp.IDFormulario', $form)
-//            ->where('TipoComp.Configuracion', true)
-//            ->where('FormComp.Estado', 'ACT')
-//            ->get(['FormComp.ID', 'Componente.Descripcion', 'Componente.IDTipoComp', 'SeccionComponente.IDSeccion as Seccion', 'FormComp.Atributo', 'FormComp.Obligatorio']);
-
-        $components = FormComp::join('SeccionComponente', 'SeccionComponente.ID', 'FormComp.IDSeccionComponente')
-            ->join('Componente', 'SeccionComponente.IDComponente', 'Componente.ID')
-            ->join('TipoComp', 'Componente.IDTipoComp', 'TipoComp.ID')
-            ->where('FormComp.IDFormulario', $form)
-            ->where('TipoComp.Configuracion', true)
-            ->where('FormComp.Estado', 'ACT')
-            ->get(['FormComp.ID', 'Componente.Descripcion', 'Componente.IDTipoComp', 'SeccionComponente.IDSeccion as Seccion', 'FormComp.Atributo', 'FormComp.Obligatorio']);
-
-//        return $components;
-
-        foreach ($Seccions as $Seccion) {
-            $Seccion["componentes"] = array_values($components->filter(function ($value, $key) use ($Seccion) {
-                return $value["Seccion"] == $Seccion["ID"];
-            })->toArray());
-        }
-
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function seccion_formulario_config(Request $request, $form)
+    {
+        $Seccions = Seccion::with('componentes.tipocomp')->where('IDFormulario', $form)->get();
         return response()->json($Seccions, 200);
     }
 
@@ -163,16 +148,55 @@ class FormularioController extends Controller
      */
     public function seccion_formulario_store(Request $request, $form)
     {
-        $Formulario = Formulario::find($form);
         $rows = $request->all();
-        foreach ($rows as $row) {
-            Formcomp::find($row['ID'])
+
+        DB::beginTransaction();
+        try {
+            foreach ($rows as $row) {
+                if ($row['ID'] == 0) {
+                    $seccion = new Seccion();
+                    $seccion->IDFormulario = $form;
+                    $seccion->fill($row);
+                    $seccion->save();
+
+                    $seccion->componentes()->createMany($row['componentes']);
+                } else {
+                    $seccion = Seccion::find($row['ID']);
+                    $seccion->fill($row);
+                    $seccion->save();
+
+                    $Updates = collect($row['componentes'])->filter(function ($value, $key) {
+                        return $value["ID"] != 0;
+                    })->values();
+
+                    foreach ($Updates as $update) {
+                        Componente::find($update['ID'])
+                            ->update(
+                                $update
+                            );
+                    }
+
+                    $Nuevos = collect($row['componentes'])->filter(function ($value, $key) {
+                        return $value["ID"] == 0;
+                    })->values();
+                    $seccion->componentes()->createMany($Nuevos->toArray());
+
+                }
+            }
+
+            Formulario::where('ID', $form)
                 ->update([
-                    'Obligatorio' => $row['Obligatorio'],
-                    'Atributo' => $row['Atributo']
+                    'IDUsers_updated' => $request->user()->id
                 ]);
+            DB::commit();
+
+            return response()->json([], 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::info($exception->getMessage());
+            return response()->json([], 201);
         }
-        return response($Formulario, 201);
+
     }
 
     /**

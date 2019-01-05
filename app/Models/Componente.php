@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Wed, 05 Dec 2018 18:38:13 +0000.
+ * Date: Thu, 27 Dec 2018 01:08:15 +0000.
  */
 
 namespace App\Models;
@@ -13,12 +13,15 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Componente
  * 
  * @property int $ID
+ * @property int $IDTipoComp
+ * @property int $IDSeccion
  * @property string $Descripcion
  * @property string $Estado
- * @property int $IDTipoComp
- *
+ * @property string $Atributo
+ * @property int $Obligatorio
+ * 
  * @property \App\Models\Tipocomp $tipocomp
- * @property \App\Models\SeccionComponente $seccioncomponentes
+ * @property \App\Models\Seccion $seccion
  *
  * @package App\Models
  */
@@ -29,14 +32,20 @@ class Componente extends Eloquent
 	public $timestamps = false;
 
 	protected $casts = [
-		'ID' => 'int',
-		'IDTipoComp' => 'int'
+		'IDTipoComp' => 'int',
+		'IDSeccion' => 'int',
+		'Obligatorio' => 'int',
+        'Atributo' => 'array',
+
 	];
 
 	protected $fillable = [
+		'IDTipoComp',
+		'IDSeccion',
 		'Descripcion',
 		'Estado',
-		'IDTipoComp'
+		'Atributo',
+		'Obligatorio'
 	];
 
 	public function tipocomp()
@@ -44,8 +53,8 @@ class Componente extends Eloquent
 		return $this->belongsTo(\App\Models\Tipocomp::class, 'IDTipoComp');
 	}
 
-    public function seccioncomponentes()
-    {
-        return $this->hasMany(\App\Models\SeccionComponente::class, 'IDComponente');
-    }
+	public function seccion()
+	{
+		return $this->belongsTo(\App\Models\Seccion::class, 'IDSeccion');
+	}
 }

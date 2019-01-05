@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Thu, 27 Dec 2018 01:08:15 +0000.
  */
 
 namespace App\Models;
@@ -13,13 +13,16 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Formulario
  * 
  * @property int $ID
- * @property int $IDUsers_created
- * @property int $IDUsers_updated
  * @property string $Descripcion
  * @property string $Observacion
  * @property string $Estado
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property int $IDUsers_created
+ * @property int $IDUsers_updated
  * 
- * @property \Illuminate\Database\Eloquent\Collection $formcomps
+ * @property \Illuminate\Database\Eloquent\Collection $inspeccions
+ * @property \Illuminate\Database\Eloquent\Collection $seccions
  *
  * @package App\Models
  */
@@ -29,19 +32,25 @@ class Formulario extends Eloquent
 	protected $primaryKey = 'ID';
 
 	protected $casts = [
-		'ID' => 'int',
 		'IDUsers_created' => 'int',
-		'IDUsers_updated' => 'int',
+		'IDUsers_updated' => 'int'
 	];
 
 	protected $fillable = [
 		'Descripcion',
 		'Observacion',
-		'Estado'
+		'Estado',
+		'IDUsers_created',
+		'IDUsers_updated'
 	];
 
-	public function formcomps()
+	public function inspeccions()
 	{
-		return $this->hasMany(\App\Models\Formcomp::class, 'IDFormulario');
+		return $this->hasMany(\App\Models\Inspeccion::class, 'IDFormulario');
+	}
+
+	public function seccions()
+	{
+		return $this->hasMany(\App\Models\Seccion::class, 'IDFormulario');
 	}
 }

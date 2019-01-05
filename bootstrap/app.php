@@ -94,8 +94,8 @@ $app->routeMiddleware([
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
 // Firebase
-$app->register(SafeStudio\Firebase\FirebaseServiceProvider::class);
-class_alias(SafeStudio\Firebase\Facades\FirebaseFacades::class, 'Firebase');
+//$app->register(SafeStudio\Firebase\FirebaseServiceProvider::class);
+////class_alias(SafeStudio\Firebase\Facades\FirebaseFacades::class, 'Firebase');
 
 /*
 |--------------------------------------------------------------------------

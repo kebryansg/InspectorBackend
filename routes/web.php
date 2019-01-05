@@ -4,6 +4,17 @@
 
 use Illuminate\Support\Facades\DB;
 
+use Morrislaptop\Firestore\Factory;
+use Kreait\Firebase\ServiceAccount;
+
+
+
+$serviceAccount = ServiceAccount::fromJsonFile(dirname(__DIR__) . '/app/secret/inspector-7933a.json');
+$firestore = (new Factory)
+    ->withServiceAccount($serviceAccount)
+    ->createFirestore();
+
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
@@ -173,11 +184,14 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #endregion
 
     #region Formulario-Seccion
-//    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
+//    $router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
+    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_config"]);
     $router->post('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_store"]);
-    $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
-    $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
-    $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);
+
+
+//    $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
+//    $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
+//    $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);
     #endregion
 
 
@@ -188,27 +202,52 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 });
 
 
-$router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_full"]);
+/* Pruebas Ionic */
+$router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
-
-$router->get('firebase/', function () {
-    return Firebase::get('/colaborador', ['print' => 'pretty']);
-//    return response()->json($data,201);
+$router->get('inspeccion_sync', function(){
+    $rows = \App\Models\Inspeccion::join('Empresa', 'IDEmpresa', 'Empresa.ID')
+        ->whereNotNull('IDColaborador')
+        ->get([ 'Inspeccion.FechaTentativa', 'Empresa.Descripcion as Empresa', 'Inspeccion.IDFormulario', 'Inspeccion.Estado' ]);
+    return response()->json($rows, 200);
 });
 
-$router->post('firebase/', function () {
+
+
+//$router->get('online/', function () use($firestore) {
+//    return \App\Http\Controllers\Utilidad::Online()? 'Online': 'Offline';
+//});
+
+
+$router->get('firebase/', function () use($firestore) {
+    $collection = $firestore->collection('colaborador');
+    $rows = [];
+    foreach ($collection->documents() as $document){
+        $rows[] = $document->data();
+    }
+
+    return response()->json($rows,201);
+});
+
+$router->post('firebase/', function () use($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
 
     foreach ($colaboradors as $Colaborador){
 //        $key = $colaborador->created_at->getTimestamp();
-        Firebase::set('/colaborador/colb_'. $Colaborador->ID, [
+
+        $collection = $firestore->collection('colaborador');
+        $FireValue = $collection->document('colb_'. $Colaborador->ID);
+
+        $FireValue->set([
             'ID' => $Colaborador->ID,
             'Cedula' => $Colaborador->Cedula,
+            'Email' => $Colaborador->Email,
             'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
             'Created_at' => $Colaborador->created_at->getTimestamp(),
             'Updated_at' => $Colaborador->updated_at->getTimestamp()
         ]);
+
     }
     return $colaboradors;
 });

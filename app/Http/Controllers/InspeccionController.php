@@ -8,13 +8,23 @@ use App\Models\Formulario;
 use App\Models\Inspeccion;
 use App\Models\Parametro;
 use Carbon\Carbon;
-use Firebase;
+//use Firebase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Morrislaptop\Firestore\Factory;
+use Kreait\Firebase\ServiceAccount;
 
 class InspeccionController extends Controller
 {
-    private $Firebase_URL = '/inspeccion';
+    private $firestore;
+
+    public function __construct()
+    {
+        $serviceAccount = ServiceAccount::fromJsonFile(dirname(dirname(__DIR__)) . '/secret/inspector-7933a.json');
+        $this->firestore = (new Factory)
+            ->withServiceAccount($serviceAccount)
+            ->createFirestore();
+    }
 
     /**
      * Display a listing of the resource.
@@ -47,6 +57,7 @@ class InspeccionController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $Inspeccion = new Inspeccion();
 
         // Validación
 //        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
@@ -65,29 +76,20 @@ class InspeccionController extends Controller
 
         DB::beginTransaction();
         try {
-
-            $Inspeccion = new Inspeccion();
             $Inspeccion->fill($request->all());
             $Inspeccion->UsuarioRegistro = $request->user()->id;
             $Inspeccion->Estado = 'PEN';
             $Inspeccion->IDFormulario = Clasificacion::join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')->where('Empresa.ID', $Inspeccion->IDEmpresa)->first()->IDFormulario;
-//            return response()->json($Inspeccion, 201);
             $Inspeccion->save();
-
-            if ($Inspeccion->IDColaborador) {
-                $DataFirebase = [
-                    'FechaTentativa' => Carbon::createFromFormat('Y-m-d\TH:i:s+', $Inspeccion->FechaTentativa)->format('Y-m-d'),
-                    'IDFormulario' => $Inspeccion->IDFormulario
-                ];
-                Firebase::set($this->Firebase_URL . ('/colb_' . $Inspeccion->IDColaborador) . ('/insp_' . $Inspeccion->ID), $DataFirebase);
-            }
             DB::commit();
-            return response()->json($Inspeccion, 201);
+            if (!Utilidad::Online())
+                return response()->json($Inspeccion, 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json($exception->getMessage(), 201);
         }
-
+        $this->uploadFirebase($Inspeccion);
+        return response()->json($Inspeccion, 201);
 
     }
 
@@ -135,30 +137,23 @@ class InspeccionController extends Controller
     public function inspeccion_colaborador(Request $request, $id, $colaborador)
     {
         $days = Parametro::where('Abr', 'MDINP')->first()->Valor;
-        $FechaTentativa = Carbon::now()->addDays($days);
         DB::beginTransaction();
-        try{
+        try {
             $Inspeccion = Inspeccion::find($id);
-            $bandera = $Inspeccion->update([
+            $Inspeccion->update([
                 'IDColaborador' => $colaborador,
                 'FechaTentativa' => Carbon::now()->addDays($days),
                 'UsuarioUpdate' => $request->user()->id
             ]);
-
-            if ($bandera) {
-                $DataFirebase = [
-                    'FechaTentativa' => $FechaTentativa->format('Y-m-d'),
-                    'IDFormulario' => $Inspeccion->IDFormulario
-                ];
-                Firebase::set($this->Firebase_URL . ('/colb_' . $colaborador) . ('/insp_' . $Inspeccion->ID), $DataFirebase);
-            }
-
             DB::commit();
-            return response()->json($Inspeccion, 201);
-        }catch (\Exception $exception){
+            if (!Utilidad::Online())
+                return response()->json($Inspeccion, 201);
+        } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json($exception->getMessage(), 500);
         }
+        $this->uploadFirebase($Inspeccion);
+        return response()->json($Inspeccion, 201);
 
     }
 
@@ -176,4 +171,35 @@ class InspeccionController extends Controller
         ]);
         return response()->json($Inspeccion, 201);
     }
+
+    private function uploadFirebase(Inspeccion $Inspeccion)
+    {
+        $DataFirebase = null;
+        if ($Inspeccion->IDColaborador) {
+            $DataFirebase = [
+                'ID' => $Inspeccion->ID,
+                'FechaTentativa' => Carbon::createFromFormat('Y-m-d\TH:i:s+', $Inspeccion->FechaTentativa)->format('Y-m-d'),
+                'IDFormulario' => $Inspeccion->IDFormulario,
+                'IDColaborador' => $Inspeccion->IDColaborador,
+                'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
+                    ->first([
+                        'ID',
+                        'RUC',
+                        'RazonSocial',
+                        'NombreComercial',
+                        'TipoContribuyente',
+                        'Direccion',
+                        'Telefono',
+                        'Celular',
+                        'Email'
+                    ])->toArray()
+            ];
+
+            $document = $this->firestore->collection('inspeccion')->document('insp_' . $Inspeccion->ID);
+            $document->set($DataFirebase);
+            $Inspeccion->firebase_at = Carbon::now();
+            $Inspeccion->save();
+        }
+    }
+
 }

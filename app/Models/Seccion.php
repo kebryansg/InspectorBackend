@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Wed, 05 Dec 2018 18:38:13 +0000.
+ * Date: Thu, 27 Dec 2018 01:08:15 +0000.
  */
 
 namespace App\Models;
@@ -16,8 +16,9 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Descripcion
  * @property string $Observacion
  * @property string $Estado
+ * @property int $IDFormulario
  * 
- * @property \Illuminate\Database\Eloquent\Collection $seccioncomponentes
+ * @property \App\Models\Formulario $formulario
  * @property \Illuminate\Database\Eloquent\Collection $componentes
  *
  * @package App\Models
@@ -28,21 +29,24 @@ class Seccion extends Eloquent
 	protected $primaryKey = 'ID';
 	public $timestamps = false;
 
+	protected $casts = [
+		'IDFormulario' => 'int'
+	];
+
 	protected $fillable = [
 		'Descripcion',
 		'Observacion',
-		'Estado'
+		'Estado',
+		'IDFormulario'
 	];
 
-    public function seccioncomponentes()
-    {
-        return $this->hasMany(\App\Models\SeccionComponente::class, 'IDSeccion');
-    }
+	public function formulario()
+	{
+		return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
+	}
 
-    public function componentes()
-    {
-        return $this->belongsToMany(\App\Models\Componente::class, 'seccioncomponente', 'IDSeccion', 'IDComponente')
-            ->withPivot('ID', 'Estado');
-    }
-
+	public function componentes()
+	{
+		return $this->hasMany(\App\Models\Componente::class, 'IDSeccion');
+	}
 }

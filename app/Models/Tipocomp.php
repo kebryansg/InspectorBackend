@@ -29,7 +29,8 @@ class Tipocomp extends Eloquent
     public $timestamps = false;
 
     protected $casts = [
-        'Configuracion' => 'bool'
+        'Configuracion' => 'bool',
+        'Valor' => 'array'
     ];
 
     protected $fillable = [

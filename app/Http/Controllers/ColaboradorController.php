@@ -4,13 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Colaborador;
 use App\Models\Parametro;
+use Carbon\Carbon;
 use Firebase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Morrislaptop\Firestore\Factory;
+use Kreait\Firebase\ServiceAccount;
 
 class ColaboradorController extends Controller
 {
-    private $Firebase_URL = '/colaborador/';
+    private $firestore;
+
+    public function __construct()
+    {
+        $serviceAccount = ServiceAccount::fromJsonFile(dirname(dirname(__DIR__)) . '/secret/inspector-7933a.json');
+        $this->firestore = (new Factory)
+            ->withServiceAccount($serviceAccount)
+            ->createFirestore();
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -67,16 +79,8 @@ class ColaboradorController extends Controller
 
         /* Registo de Colaboradores que tienen como cargo Inspector (Definido como paremetro global) */
         $Parametro = Parametro::where('Abr', 'CINPS')->first();
-        if ($Colaborador->IDCargo == $Parametro->Valor) {
-            $DataFirebase = [
-                'ID' => $Colaborador->ID,
-                'Cedula' => $Colaborador->Cedula,
-                'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
-                'Created_at' => $Colaborador->created_at->getTimestamp(),
-                'Updated_at' => $Colaborador->updated_at->getTimestamp(),
-            ];
-            Firebase::set($this->Firebase_URL . 'colb' . $Colaborador->ID, $DataFirebase);
-        }
+        if ($Colaborador->IDCargo == $Parametro->Valor && Utilidad::Online())
+            $this->uploadFirebase($Colaborador);
 
         return response($Colaborador, 201);
     }
@@ -90,7 +94,7 @@ class ColaboradorController extends Controller
     public function show(Request $request, $id)
     {
 //        $Colaborador = Colaborador::find($id);
-        $Colaborador = Colaborador::find($id)
+        $Colaborador = Colaborador::where('Colaborador.ID', $id)
             ->join('Area', 'Area.ID', 'IDArea')
             ->join('Departamento', 'Departamento.ID', 'IDDepartamento')
             ->first(['Colaborador.*', 'Departamento.ID as Departamento']);
@@ -124,16 +128,8 @@ class ColaboradorController extends Controller
         $Colaborador->save();
 
         /* Si el cargo es actualizado como cargo Inspector (Definido como paremetro global) */
-        if ($Colaborador->IDCargo == $Parametro->Valor) {
-            $DataFirebase = [
-                'ID' => $Colaborador->ID,
-                'Cedula' => $Colaborador->Cedula,
-                'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
-                'Created_at' => $Colaborador->created_at->getTimestamp(),
-                'Updated_at' => $Colaborador->updated_at->getTimestamp(),
-            ];
-            Firebase::set($this->Firebase_URL . 'colb_' . $Colaborador->ID, $DataFirebase);
-        }
+        if ($Colaborador->IDCargo == $Parametro->Valor && Utilidad::Online())
+            $this->uploadFirebase($Colaborador);
         return response($Colaborador, 201);
     }
 
@@ -149,5 +145,22 @@ class ColaboradorController extends Controller
         $Colaborador->Estado = 'INA';
         $Colaborador->save();
         return response($Colaborador, 201);
+    }
+
+    private function uploadFirebase(Colaborador $Colaborador)
+    {
+        $DataFirebase = [
+            'ID' => $Colaborador->ID,
+            'Cedula' => $Colaborador->Cedula,
+            'Email' => $Colaborador->Email,
+            'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
+            'Created_at' => $Colaborador->created_at->getTimestamp(),
+            'Updated_at' => $Colaborador->updated_at->getTimestamp(),
+        ];
+
+        $document = $this->firestore->collection('colaborador')->document('colb_' . $Colaborador->ID);
+        $document->set($DataFirebase);
+        $Colaborador->firebase_at = Carbon::now();
+        $Colaborador->save();
     }
 }

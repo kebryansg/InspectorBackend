@@ -25,7 +25,7 @@ class TipoComponenteController extends Controller
      */
     public function combo( Request $request )
     {
-        $TipoComponente = Tipocomp::all([ 'ID', 'Descripcion' ]);
+        $TipoComponente = Tipocomp::all();
         return response()->json($TipoComponente, 200);
     }
 }

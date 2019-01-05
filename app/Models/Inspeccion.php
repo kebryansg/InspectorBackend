@@ -24,7 +24,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $UsuarioUpdate
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * 
+ * @property \Carbon\Carbon $firebase_at
+ *
  * @property \App\Models\Empresa $empresa
  * @property \App\Models\Colaborador $colaborador
  * @property \App\Models\Formulario $formulario
@@ -49,6 +50,7 @@ class Inspeccion extends Eloquent
 		'FechaInspeccion' ,
         'created_at',
         'updated_at',
+        'firebase_at',
 		'FechaTentativa' => 'Y-m-d\TH:i:s+'
 	];
 
