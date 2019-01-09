@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $firebase_at
  *
- * @property \App\Models\Empresa $empresa
+ * @property \App\Models\Empresa $Empresa
  * @property \App\Models\Colaborador $colaborador
  * @property \App\Models\Formulario $formulario
  *

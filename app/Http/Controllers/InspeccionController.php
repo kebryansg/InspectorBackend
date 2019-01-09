@@ -59,20 +59,20 @@ class InspeccionController extends Controller
         $data = $request->all();
         $Inspeccion = new Inspeccion();
 
-        // Validación
-//        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
-//            return response()->json([
-//                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
-//            ], 409);
-//        }
-//
-//        if (!Formulario::join('Clasificacion', 'Clasificacion.IDFormulario', 'Formulario.ID')
-//            ->join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')
-//            ->where('Empresa.ID', $data['IDEmpresa'])->exists()) {
-//            return response()->json([
-//                'message' => 'No existe un formulario asignado para la Actividad Económica de la Empresa.'
-//            ], 409);
-//        }
+//         Validación
+        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
+            return response()->json([
+                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
+            ], 409);
+        }
+
+        if (!Formulario::join('Clasificacion', 'Clasificacion.IDFormulario', 'Formulario.ID')
+            ->join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')
+            ->where('Empresa.ID', $data['IDEmpresa'])->exists()) {
+            return response()->json([
+                'message' => 'No existe un formulario asignado para la Actividad Económica de la Empresa.'
+            ], 409);
+        }
 
         DB::beginTransaction();
         try {
@@ -172,15 +172,27 @@ class InspeccionController extends Controller
         return response()->json($Inspeccion, 201);
     }
 
-    private function uploadFirebase(Inspeccion $Inspeccion)
+    public function upload(Request $request, $id)
+    {
+        $Inspeccion = Inspeccion::find($id);
+//        return response()->json($Inspeccion, 201);
+        if(Utilidad::Online()){
+            $this->uploadFirebase($Inspeccion, 'Y-m-d H:i:s');
+            return response()->json('Actualizado', 201);
+        }
+        return response()->json('No Actualizado', 201);
+    }
+
+    private function uploadFirebase(Inspeccion $Inspeccion, $format = 'Y-m-d\TH:i:s+' )
     {
         $DataFirebase = null;
         if ($Inspeccion->IDColaborador) {
             $DataFirebase = [
                 'ID' => $Inspeccion->ID,
-                'FechaTentativa' => Carbon::createFromFormat('Y-m-d\TH:i:s+', $Inspeccion->FechaTentativa)->format('Y-m-d'),
+                'FechaTentativa' => Carbon::createFromFormat($format, $Inspeccion->FechaTentativa)->format('Y-m-d'),
                 'IDFormulario' => $Inspeccion->IDFormulario,
                 'IDColaborador' => $Inspeccion->IDColaborador,
+                'Estado' => $Inspeccion->Estado,
                 'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
                     ->first([
                         'ID',

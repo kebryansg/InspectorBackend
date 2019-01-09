@@ -8,7 +8,6 @@ use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
 
 
-
 $serviceAccount = ServiceAccount::fromJsonFile(dirname(__DIR__) . '/app/secret/inspector-7933a.json');
 $firestore = (new Factory)
     ->withServiceAccount($serviceAccount)
@@ -16,7 +15,7 @@ $firestore = (new Factory)
 
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return response()->json($router->app->version(), 200);
 });
 
 $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
@@ -100,8 +99,9 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('colaborador/{id}/', ['uses' => 'ColaboradorController@show']);
     $router->get('colaborador_inspector/', ['uses' => 'ColaboradorController@inspectores']);
     $router->post('colaborador', ['uses' => 'ColaboradorController@store']);
-    $router->put('colaborador/{id}', ['uses' => 'ColaboradorController@update']);
-    $router->delete('colaborador/{id}', ['uses' => 'ColaboradorController@destroy']);
+    $router->get('colaborador/{id}/async', ['uses' => 'ColaboradorController@upload']);
+    $router->put('colaborador/{id}/', ['uses' => 'ColaboradorController@update']);
+    $router->delete('colaborador/{id}/', ['uses' => 'ColaboradorController@destroy']);
 
 
     #region Localization
@@ -145,6 +145,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     $router->get('inspeccion', ["uses" => "InspeccionController@index"]);
     $router->get('inspeccion/{id}/', ['uses' => 'InspeccionController@show']);
+    $router->get('inspeccion/{id}/async', ['uses' => 'InspeccionController@upload']);
     $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
     $router->put('inspeccion/{id}/', ['uses' => 'InspeccionController@update']);
     $router->delete('inspeccion/{id}/', ['uses' => 'InspeccionController@destroy']);
@@ -154,6 +155,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Formulario
     $router->get('formulario', ["uses" => "FormularioController@index"]);
     $router->get('formulario_combo', ["uses" => "FormularioController@combo"]);
+    $router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
     $router->get('formulario/{id}/', ['uses' => 'FormularioController@show']);
     $router->post('formulario', ['uses' => 'FormularioController@store']);
     $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);
@@ -205,39 +207,65 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 /* Pruebas Ionic */
 $router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
-$router->get('inspeccion_sync', function(){
-    $rows = \App\Models\Inspeccion::join('Empresa', 'IDEmpresa', 'Empresa.ID')
-        ->whereNotNull('IDColaborador')
-        ->get([ 'Inspeccion.FechaTentativa', 'Empresa.Descripcion as Empresa', 'Inspeccion.IDFormulario', 'Inspeccion.Estado' ]);
+$router->get('inspeccion_sync', function () {
+    $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')
+        ->get([
+            'Inspeccion.ID',
+            'Inspeccion.FechaTentativa',
+            'IDEmpresa',
+            'Inspeccion.IDColaborador',
+            'Inspeccion.IDFormulario',
+            'Inspeccion.Estado'
+        ]);
+    $Empresa = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get();
+
+    foreach ($Inspeccions as $Inspeccion) {
+        $Inspeccion["Empresa"] = $Empresa->firstWhere('ID', $Inspeccion['IDEmpresa']);
+        unset($Inspeccion['IDEmpresa']);
+    }
+
+    return response()->json($Inspeccions, 200);
+});
+
+$router->get('colaborador_sync', function () {
+    $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)->get();
+    $rows = [];
+    foreach ($colaboradors as $Colaborador) {
+        $rows[] = [
+            'ID' => $Colaborador->ID,
+            'Cedula' => $Colaborador->Cedula,
+            'Email' => $Colaborador->Email,
+            'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
+            'Created_at' => $Colaborador->created_at->getTimestamp(),
+            'Updated_at' => $Colaborador->updated_at->getTimestamp(),
+        ];
+    }
     return response()->json($rows, 200);
 });
 
 
 
-//$router->get('online/', function () use($firestore) {
-//    return \App\Http\Controllers\Utilidad::Online()? 'Online': 'Offline';
-//});
 
 
-$router->get('firebase/', function () use($firestore) {
+$router->get('firebase/', function () use ($firestore) {
     $collection = $firestore->collection('colaborador');
     $rows = [];
-    foreach ($collection->documents() as $document){
+    foreach ($collection->documents() as $document) {
         $rows[] = $document->data();
     }
 
-    return response()->json($rows,201);
+    return response()->json($rows, 201);
 });
 
-$router->post('firebase/', function () use($firestore) {
+$router->post('firebase/', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
 
-    foreach ($colaboradors as $Colaborador){
+    foreach ($colaboradors as $Colaborador) {
 //        $key = $colaborador->created_at->getTimestamp();
 
         $collection = $firestore->collection('colaborador');
-        $FireValue = $collection->document('colb_'. $Colaborador->ID);
+        $FireValue = $collection->document('colb_' . $Colaborador->ID);
 
         $FireValue->set([
             'ID' => $Colaborador->ID,

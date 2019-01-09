@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: KebryanSG
- * Date: 5/1/2019
- * Time: 1:33
- */
 
 namespace App\Http\Controllers;
-
 
 class Utilidad
 {

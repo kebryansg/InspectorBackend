@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Estado
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $firebase_at
  * @property int $IDUsers_created
  * @property int $IDUsers_updated
  * 
@@ -34,6 +35,10 @@ class Formulario extends Eloquent
 	protected $casts = [
 		'IDUsers_created' => 'int',
 		'IDUsers_updated' => 'int'
+	];
+
+	protected $dates = [
+		'firebase_at'
 	];
 
 	protected $fillable = [

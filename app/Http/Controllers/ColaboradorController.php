@@ -31,10 +31,12 @@ class ColaboradorController extends Controller
      */
     public function index(Request $request)
     {
+        $Parametro = Parametro::where('Abr', 'CINPS')->first()->Valor;
         $Clasificacion = Colaborador::join('Cargo', 'Cargo.ID', 'IDCargo')
             ->join('Area', 'Area.ID', 'IDArea')
             ->join('Compania', 'Compania.ID', 'IDCompania')
-            ->select(['Colaborador.*', 'Cargo.Descripcion as Cargo', 'Area.Descripcion as Area', 'Compania.Nombre as Compania'])
+            ->select(['Colaborador.*', 'Cargo.Descripcion as Cargo', 'Area.Descripcion as Area', 'Compania.Nombre as Compania',
+                DB::raw('IF(Cargo.ID = ' . $Parametro . ', 1, 0) as Inspector')])
             ->paginate($request->input('psize'));
         return response($Clasificacion, 201);
     }
@@ -131,6 +133,17 @@ class ColaboradorController extends Controller
         if ($Colaborador->IDCargo == $Parametro->Valor && Utilidad::Online())
             $this->uploadFirebase($Colaborador);
         return response($Colaborador, 201);
+    }
+
+    public function upload(Request $request, $id)
+    {
+        $Colaborador = Colaborador::find($id);
+        $Internet = Utilidad::Online();
+        if ($Internet) {
+            $this->uploadFirebase($Colaborador);
+            return response()->json('Actualizado', 200);
+        } else
+            return response()->json('No Actualizado', 200);
     }
 
     /**

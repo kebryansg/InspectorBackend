@@ -6,12 +6,38 @@ use App\Models\Componente;
 use App\Models\Formcomp;
 use App\Models\Formulario;
 use App\Models\Seccion;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Morrislaptop\Firestore\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase;
 
 class FormularioController extends Controller
 {
+
+    private $firestore;
+    private $firebase;
+
+    public function __construct()
+    {
+
+        // Descargar Archivo al navegador
+        //return response($data, 200, [ 'Content-Type:' =>' application/json', 'Content-Disposition' => 'attachment; filename="result.json"', ]);
+
+
+        $serviceAccount = ServiceAccount::fromJsonFile(dirname(dirname(__DIR__)) . '/secret/inspector-7933a.json');
+        $this->firestore = (new Factory)
+            ->withServiceAccount($serviceAccount)
+            ->createFirestore();
+
+        $this->firebase = (new Firebase\Factory())
+            ->withServiceAccount($serviceAccount)
+            ->create();
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -57,7 +83,11 @@ class FormularioController extends Controller
         $Formulario->fill($request->all());
         $Formulario->IDUsers_created = $request->user()->id;
         $Formulario->save();
-        return response($Formulario, 201);
+        if (!Utilidad::Online())
+            return response()->json($Formulario, 201);
+
+        $this->uploadFirebase($Formulario);
+        return response()->json($Formulario, 201);
     }
 
     /**
@@ -96,7 +126,11 @@ class FormularioController extends Controller
         $Formulario->fill($request->all());
         $Formulario->IDUsers_updated = $request->user()->id;
         $Formulario->save();
-        return response($Formulario, 201);
+        if (!Utilidad::Online())
+            return response()->json($Formulario, 201);
+
+        $this->uploadFirebase($Formulario);
+        return response()->json($Formulario, 201);
     }
 
     /**
@@ -281,4 +315,54 @@ class FormularioController extends Controller
 
         return response()->json($Formulario, 201);
     }
+
+    private function uploadFirebase(Formulario $Formulario)
+    {
+        $DataFirebase = [
+            'ID' => $Formulario->ID,
+            'Descripcion' => $Formulario->Descripcion,
+            'Observacion' => $Formulario->Observacion,
+            'Estado' => $Formulario->Estado,
+            'Created_at' => $Formulario->created_at->getTimestamp(),
+            'Updated_at' => $Formulario->updated_at->getTimestamp(),
+        ];
+
+        $document = $this->firestore->collection('formulario')->document('form_' . $Formulario->ID);
+        $document->set($DataFirebase);
+        $Formulario->firebase_at = Carbon::now();
+        $Formulario->save();
+    }
+
+
+    public function syncFormulario(Request $request){
+
+        $query = Formulario::with(
+            ['seccions.componentes' => function ($query) {
+                return $query->where('Estado', 'ACT');
+            }])
+            ->where('Formulario.Estado', 'ACT');
+        if($request->input('ID')){
+            $query->where('Formulario.ID', $request->input('ID'));
+        }
+        $Formularios = $query->get();
+
+        foreach ($Formularios as $formulario){
+            $data = json_encode($formulario->toArray(), JSON_PRETTY_PRINT);
+            $storage = $this->firebase->getStorage();
+            $bucket = $storage->getBucket();
+
+            $bucket->upload(
+                $data,
+                [
+                    'name' => 'Formulario/form_'. $formulario["ID"].'.json'
+                ]
+            );
+        }
+
+        return response()->json('true', 200);
+
+
+    }
+
+
 }
