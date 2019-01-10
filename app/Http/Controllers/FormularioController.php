@@ -347,7 +347,7 @@ class FormularioController extends Controller
         $Formularios = $query->get();
 
         foreach ($Formularios as $formulario){
-            $data = json_encode($formulario->toArray(), JSON_PRETTY_PRINT);
+            $data = json_encode($formulario->toArray()["seccions"], JSON_PRETTY_PRINT);
             $storage = $this->firebase->getStorage();
             $bucket = $storage->getBucket();
 

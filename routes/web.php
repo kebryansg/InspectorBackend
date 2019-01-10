@@ -155,7 +155,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Formulario
     $router->get('formulario', ["uses" => "FormularioController@index"]);
     $router->get('formulario_combo', ["uses" => "FormularioController@combo"]);
-    $router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
+//    $router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
     $router->get('formulario/{id}/', ['uses' => 'FormularioController@show']);
     $router->post('formulario', ['uses' => 'FormularioController@store']);
     $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);
@@ -244,7 +244,7 @@ $router->get('colaborador_sync', function () {
 });
 
 
-
+$router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
 
 
 $router->get('firebase/', function () use ($firestore) {
