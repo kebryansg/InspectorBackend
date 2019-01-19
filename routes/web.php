@@ -19,17 +19,15 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
+
     $router->get('/users', function (\Illuminate\Http\Request $request) {
         return $request->user();
     });
 
+    #region Institucion
+
     $router->get('institucion', ["uses" => "InstitucionController@index"]);
     $router->put('institucion/{id}', ['uses' => 'InstitucionController@update']);
-    //$router->delete('institucion/{id}', ['uses' => 'InstitucionController@destroy']);
-    //$router->post('institucion', ['uses' => 'InstitucionController@store']);
-//    $router->get('institucion/{id}', ['uses' => 'InstitucionController@show']);
-    //$router->get('comboempresa', ['uses' => 'EmpresaController@combo']);
-
 
     $router->get('compania', ["uses" => "CompaniaController@index"]);
     $router->get('compania/{id}', ['uses' => 'CompaniaController@show']);
@@ -38,18 +36,62 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->post('compania', ['uses' => 'CompaniaController@store']);
     $router->get('compania_combo', ['uses' => 'CompaniaController@combo']);
 
+    $router->get('departamento', ["uses" => "DepartamentoController@index"]);
+    $router->get('departamento/{id}', ['uses' => 'DepartamentoController@show']);
+    $router->post('departamento', ['uses' => 'DepartamentoController@store']);
+    $router->put('departamento/{id}', ['uses' => 'DepartamentoController@update']);
+    $router->delete('departamento/{id}', ['uses' => 'DepartamentoController@destroy']);
+    $router->get('departamento_combo', ["uses" => "DepartamentoController@combo"]);
+
+    $router->get('area', ["uses" => "AreaController@index"]);
+    $router->get('area_combo', ["uses" => "AreaController@combo"]);
+    $router->get('area/{id}', ['uses' => 'AreaController@show']);
+    $router->post('area', ['uses' => 'AreaController@store']);
+    $router->put('area/{id}', ['uses' => 'AreaController@update']);
+    $router->delete('area/{id}', ['uses' => 'AreaController@destroy']);
+    #endregion
+
+    #region Empresa
+    $router->get('empresa', ["uses" => "EmpresaController@index"]);
+    $router->get('empresa/{id}', ['uses' => 'EmpresaController@show']);
+    $router->post('empresa', ['uses' => 'EmpresaController@store']);
+    $router->put('empresa/{id}', ['uses' => 'EmpresaController@update']);
+    $router->delete('empresa/{id}', ['uses' => 'EmpresaController@destroy']);
+
+    $router->get('entidad', ["uses" => "EntidadController@index"]);
+    $router->get('entidad_combo', ["uses" => "EntidadController@combo"]);
+    $router->get('entidad/{id}', ['uses' => 'EntidadController@show']);
+    $router->post('entidad', ['uses' => 'EntidadController@store']);
+    $router->put('entidad/{id}', ['uses' => 'EntidadController@update']);
+    $router->delete('entidad/{id}', ['uses' => 'EntidadController@destroy']);
+    #endregion
+
+    #region Nomina
+
+    $router->get('colaborador', ["uses" => "ColaboradorController@index"]);
+    $router->get('colaborador/{id}/', ['uses' => 'ColaboradorController@show']);
+    $router->get('colaborador_inspector/', ['uses' => 'ColaboradorController@inspectores']);
+    $router->post('colaborador', ['uses' => 'ColaboradorController@store']);
+    $router->get('colaborador/{id}/async', ['uses' => 'ColaboradorController@upload']);
+    $router->put('colaborador/{id}/', ['uses' => 'ColaboradorController@update']);
+    $router->delete('colaborador/{id}/', ['uses' => 'ColaboradorController@destroy']);
+
+    $router->get('cargo', ["uses" => "CargoController@index"]);
+    $router->get('cargo_combo', ["uses" => "CargoController@combo"]);
+    $router->get('cargo/{id}', ['uses' => 'CargoController@show']);
+    $router->post('cargo', ['uses' => 'CargoController@store']);
+    $router->put('cargo/{id}', ['uses' => 'CargoController@update']);
+    $router->delete('cargo/{id}', ['uses' => 'CargoController@destroy']);
+
+    #endregion
+
+    #region ActividadEconómica
     $router->get('tipoact', ["uses" => "TipoActEconomicaController@index"]);
     $router->get('tipoact_combo', ["uses" => "TipoActEconomicaController@combo"]);
     $router->get('tipoact/{id}', ['uses' => 'TipoActEconomicaController@show']);
     $router->post('tipoact', ['uses' => 'TipoActEconomicaController@store']);
     $router->put('tipoact/{id}', ['uses' => 'TipoActEconomicaController@update']);
     $router->delete('tipoact/{id}', ['uses' => 'TipoActEconomicaController@destroy']);
-
-    $router->get('empresa', ["uses" => "EmpresaController@index"]);
-    $router->get('empresa/{id}', ['uses' => 'EmpresaController@show']);
-    $router->post('empresa', ['uses' => 'EmpresaController@store']);
-    $router->put('empresa/{id}', ['uses' => 'EmpresaController@update']);
-    $router->delete('empresa/{id}', ['uses' => 'EmpresaController@destroy']);
 
     $router->get('clasificacion', ["uses" => "ClasificacionController@index"]);
     $router->get('clasificacion_combo', ["uses" => "ClasificacionController@combo"]);
@@ -66,43 +108,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->put('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@update']);
     $router->delete('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@destroy']);
     $router->get('acteconomica_combo', ["uses" => "ActividadEconomicaController@combo"]);
-
-    $router->get('entidad', ["uses" => "EntidadController@index"]);
-    $router->get('entidad_combo', ["uses" => "EntidadController@combo"]);
-    $router->get('entidad/{id}', ['uses' => 'EntidadController@show']);
-    $router->post('entidad', ['uses' => 'EntidadController@store']);
-    $router->put('entidad/{id}', ['uses' => 'EntidadController@update']);
-    $router->delete('entidad/{id}', ['uses' => 'EntidadController@destroy']);
-
-    $router->get('departamento', ["uses" => "DepartamentoController@index"]);
-    $router->get('departamento/{id}', ['uses' => 'DepartamentoController@show']);
-    $router->post('departamento', ['uses' => 'DepartamentoController@store']);
-    $router->put('departamento/{id}', ['uses' => 'DepartamentoController@update']);
-    $router->delete('departamento/{id}', ['uses' => 'DepartamentoController@destroy']);
-    $router->get('departamento_combo', ["uses" => "DepartamentoController@combo"]);
-
-    $router->get('area', ["uses" => "AreaController@index"]);
-    $router->get('area_combo', ["uses" => "AreaController@combo"]);
-    $router->get('area/{id}', ['uses' => 'AreaController@show']);
-    $router->post('area', ['uses' => 'AreaController@store']);
-    $router->put('area/{id}', ['uses' => 'AreaController@update']);
-    $router->delete('area/{id}', ['uses' => 'AreaController@destroy']);
-
-    $router->get('cargo', ["uses" => "CargoController@index"]);
-    $router->get('cargo_combo', ["uses" => "CargoController@combo"]);
-    $router->get('cargo/{id}', ['uses' => 'CargoController@show']);
-    $router->post('cargo', ['uses' => 'CargoController@store']);
-    $router->put('cargo/{id}', ['uses' => 'CargoController@update']);
-    $router->delete('cargo/{id}', ['uses' => 'CargoController@destroy']);
-
-    $router->get('colaborador', ["uses" => "ColaboradorController@index"]);
-    $router->get('colaborador/{id}/', ['uses' => 'ColaboradorController@show']);
-    $router->get('colaborador_inspector/', ['uses' => 'ColaboradorController@inspectores']);
-    $router->post('colaborador', ['uses' => 'ColaboradorController@store']);
-    $router->get('colaborador/{id}/async', ['uses' => 'ColaboradorController@upload']);
-    $router->put('colaborador/{id}/', ['uses' => 'ColaboradorController@update']);
-    $router->delete('colaborador/{id}/', ['uses' => 'ColaboradorController@destroy']);
-
+    #endregion
 
     #region Localization
     $router->get('location_combo_canton', ["uses" => "LocationController@combo_canton"]);
@@ -196,17 +202,24 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 //    $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);
     #endregion
 
-
     #region TipoComponente
     $router->get('tipocomp', ["uses" => "TipoComponenteController@index"]);
     $router->get('tipocomp_combo', ["uses" => "TipoComponenteController@combo"]);
     #endregion
+
+
+    #region Device
+    $router->get('device', ["uses" => "DeviceController@index"]);
+    $router->get('device/{id}/', ['uses' => 'DeviceController@show']);
+    $router->put('device/{id}/', ['uses' => 'DeviceController@aprobarDevice']);
+    #endregion
 });
 
+// Registrar Dispositivo sin Autentificar
+$router->post('reg_device', ["uses" => "DeviceController@store"]);
 
-/* Pruebas Ionic */
-$router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
-
+// Middleware Dispositivo Registrado
+#region DownloadInfo
 $router->get('inspeccion_sync', function () {
     $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')
         ->get([
@@ -242,6 +255,11 @@ $router->get('colaborador_sync', function () {
     }
     return response()->json($rows, 200);
 });
+#endregion
+
+
+/* Pruebas Ionic */
+$router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
 
 $router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
@@ -256,7 +274,6 @@ $router->get('firebase/', function () use ($firestore) {
 
     return response()->json($rows, 201);
 });
-
 $router->post('firebase/', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();

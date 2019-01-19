@@ -15,7 +15,9 @@ class AreaController extends Controller
     public function index(Request $request)
     {
         if ($request->isJson()) {
-            $Area = Area::paginate($request->input('psize'));
+            $Area = Area::join('Departamento', 'Departamento.ID', 'Area.IDDepartamento')
+                ->select([ 'Area.*', 'Departamento.Descripcion as Departamento' ])
+                ->paginate($request->input('psize'));
             return response($Area, 201);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
