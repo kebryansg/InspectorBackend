@@ -9,21 +9,31 @@ use App\Models\Inspeccion;
 use App\Models\Parametro;
 use Carbon\Carbon;
 //use Firebase;
+use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase;
 
 class InspeccionController extends Controller
 {
     private $firestore;
+    private $firebase;
 
     public function __construct()
     {
+        // Firebase
         $serviceAccount = ServiceAccount::fromJsonFile(dirname(dirname(__DIR__)) . '/secret/inspector-7933a.json');
         $this->firestore = (new Factory)
             ->withServiceAccount($serviceAccount)
             ->createFirestore();
+
+        $this->firebase = (new Firebase\Factory())
+            ->withServiceAccount($serviceAccount)
+            ->create();
     }
 
     /**
@@ -45,7 +55,24 @@ class InspeccionController extends Controller
      */
     public function create()
     {
-        //
+
+        $result = [];
+
+        $destination = storage_path('files/form_1.json');
+        $storage = $this->firebase->getStorage();
+        $bucket = $storage->getBucket();
+        $options = ['prefix' => 'Inspeccion/'];
+        foreach ($bucket->objects($options) as $object) {
+            $result[] = ('Object: ' . $object->name());
+        }
+        return response()->json($result, 201);
+
+
+//        $object = $bucket->object('Formulario/form_2.json');
+//        $object->downloadToFile($destination);
+//
+//        return basename($destination);
+
     }
 
     /**
@@ -176,14 +203,14 @@ class InspeccionController extends Controller
     {
         $Inspeccion = Inspeccion::find($id);
 //        return response()->json($Inspeccion, 201);
-        if(Utilidad::Online()){
+        if (Utilidad::Online()) {
             $this->uploadFirebase($Inspeccion, 'Y-m-d H:i:s');
             return response()->json('Actualizado', 201);
         }
         return response()->json('No Actualizado', 201);
     }
 
-    private function uploadFirebase(Inspeccion $Inspeccion, $format = 'Y-m-d\TH:i:s+' )
+    private function uploadFirebase(Inspeccion $Inspeccion, $format = 'Y-m-d\TH:i:s+')
     {
         $DataFirebase = null;
         if ($Inspeccion->IDColaborador) {
@@ -212,6 +239,36 @@ class InspeccionController extends Controller
             $Inspeccion->firebase_at = Carbon::now();
             $Inspeccion->save();
         }
+    }
+
+
+    public function syncInspeccion(Request $request, $id)
+    {
+        $Inspeccion = Inspeccion::find($id);
+        $result = [];
+
+        Utilidad::CrearDirectorioInspeccion($id);
+
+        $storage = $this->firebase->getStorage();
+        $bucket = $storage->getBucket();
+        $options = ['prefix' => 'Inspeccion/insp_' . $id . '/'];
+        foreach ($bucket->objects($options) as $object) {
+            $destination = Utilidad::getPathPublic() . ('/Imgs/' . $object->name());
+            $object->downloadToFile($destination);
+        }
+
+        return response()->json($result, 201);
+    }
+
+    public function readAnexos(Request $request, $id)
+    {
+
+        $streams = [];
+        $contents = Utilidad::ListarDirectorioInspeccion($id);
+        foreach ($contents as $content) {
+            $streams[] = 'Imgs/' . $content["path"];
+        }
+        return response()->json($streams, 200);
     }
 
 }

@@ -2,8 +2,6 @@
 
 //date_default_timezone_set('America/Guayaquil');
 
-use Illuminate\Support\Facades\DB;
-
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
 
@@ -207,7 +205,6 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('tipocomp_combo', ["uses" => "TipoComponenteController@combo"]);
     #endregion
 
-
     #region Device
     $router->get('device', ["uses" => "DeviceController@index"]);
     $router->get('device/{id}/', ['uses' => 'DeviceController@show']);
@@ -296,3 +293,11 @@ $router->post('firebase/', function () use ($firestore) {
     }
     return $colaboradors;
 });
+
+/* Pruebas Storage */
+// $router->get('storage/', [ 'uses' => 'InspeccionController@create' ]);
+
+$router->post('inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccion']);
+$router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
+
+

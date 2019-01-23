@@ -23,7 +23,10 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
- $app->withFacades();
+ $app->withFacades(true, [
+     'GrahamCampbell\Flysystem\Facades\Flysystem' => 'Flysystem',
+     'Intervention\Image\Facades\Image' => 'Image'
+ ]);
 
  $app->withEloquent();
 
@@ -96,6 +99,12 @@ $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 // Firebase
 //$app->register(SafeStudio\Firebase\FirebaseServiceProvider::class);
 ////class_alias(SafeStudio\Firebase\Facades\FirebaseFacades::class, 'Firebase');
+
+// Storage
+$app->register(GrahamCampbell\Flysystem\FlysystemServiceProvider::class);
+
+// Intervention Image Package
+$app->register(Intervention\Image\ImageServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
