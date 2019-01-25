@@ -1,6 +1,6 @@
 <?php
 
-//date_default_timezone_set('America/Guayaquil');
+date_default_timezone_set('America/Guayaquil');
 
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
@@ -297,7 +297,8 @@ $router->post('firebase/', function () use ($firestore) {
 /* Pruebas Storage */
 // $router->get('storage/', [ 'uses' => 'InspeccionController@create' ]);
 
-$router->post('inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccion']);
+$router->put('firebase/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
+$router->put('device/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionDevice']);
 $router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
 
 

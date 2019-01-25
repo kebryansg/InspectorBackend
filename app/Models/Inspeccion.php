@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDEmpresa
  * @property int $IDColaborador
  * @property string $Observacion
+ * @property string $MedioUpdate
  * @property int $UsuarioRegistro
  * @property int $UsuarioUpdate
  * @property \Carbon\Carbon $created_at
@@ -63,7 +64,8 @@ class Inspeccion extends Eloquent
 		'IDColaborador',
 		'Observacion',
 		'UsuarioRegistro',
-		'UsuarioUpdate'
+		'UsuarioUpdate',
+        'MedioUpdate'
 	];
 
 	public function empresa()

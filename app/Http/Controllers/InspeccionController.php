@@ -7,12 +7,14 @@ use App\Models\Empresa;
 use App\Models\Formulario;
 use App\Models\Inspeccion;
 use App\Models\Parametro;
+use App\Models\Rseccion;
 use Carbon\Carbon;
 //use Firebase;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
@@ -242,27 +244,70 @@ class InspeccionController extends Controller
     }
 
 
-    public function syncInspeccion(Request $request, $id)
+    public function syncInspeccionDevice(Request $request, $id)
     {
         $Inspeccion = Inspeccion::find($id);
-        $result = [];
+        $Inspeccion->fill($request->all());
+        $Inspeccion->MedioUpdate = 'DEV';
+        $Inspeccion->save();
 
-        Utilidad::CrearDirectorioInspeccion($id);
+        $rows = $request->input('result');
+        $this->saveResult($rows, $id);
 
-        $storage = $this->firebase->getStorage();
-        $bucket = $storage->getBucket();
-        $options = ['prefix' => 'Inspeccion/insp_' . $id . '/'];
-        foreach ($bucket->objects($options) as $object) {
-            $destination = Utilidad::getPathPublic() . ('/Imgs/' . $object->name());
-            $object->downloadToFile($destination);
+
+        return response()->json([
+            "status" => true,
+            "data" => $Inspeccion
+        ], 201);
+    }
+
+    private function saveResult($rows, $id)
+    {
+        foreach ($rows as $row) {
+            $Seccion = new Rseccion();
+            $Seccion->fill($row);
+            $Seccion->IDInspeccion = $id;
+            $Seccion->save();
+            $Seccion->rcomponentes()->createMany($row['componentes']);
+
+        }
+    }
+
+    public function syncInspeccionFirebase(Request $request, $id)
+    {
+
+        try {
+            Utilidad::CrearDirectorioInspeccion($id);
+
+            $storage = $this->firebase->getStorage();
+            $bucket = $storage->getBucket();
+            $options = ['prefix' => 'Inspeccion/insp_' . $id . '/'];
+            foreach ($bucket->objects($options) as $object) {
+                $destination = Utilidad::getPathPublic() . ('/Imgs/' . $object->name());
+                $type = substr($object->name(), strrpos($object->name(), '.') + 1);
+
+                if ($type !== 'json') $object->downloadToFile($destination);
+                else {
+                    $stream = $object->downloadAsStream();
+                    $rows = json_decode($stream->getContents(),true);
+                    $this->saveResult($rows, $id);
+                }
+
+            }
+            return response()->json([
+                "status" => true
+            ], 201);
+        } catch (\Exception $exception) {
+            return response()->json([
+                "status" => false,
+                "message" => $exception->getMessage()
+            ], 201);
         }
 
-        return response()->json($result, 201);
     }
 
     public function readAnexos(Request $request, $id)
     {
-
         $streams = [];
         $contents = Utilidad::ListarDirectorioInspeccion($id);
         foreach ($contents as $content) {
