@@ -79,6 +79,10 @@ $app->routeMiddleware([
     'valid' => App\Http\Middleware\ValidationRequestMiddleware::class,
 ]);
 
+$app->routeMiddleware([
+    'device' => App\Http\Middleware\DeviceMiddleware::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

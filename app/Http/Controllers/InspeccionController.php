@@ -137,7 +137,8 @@ class InspeccionController extends Controller
                 return $query;
             },
             'colaborador',
-            'formulario'
+            'formulario',
+            'observacions'
         ])
             ->where('ID', $id)
             ->first();
@@ -213,6 +214,22 @@ class InspeccionController extends Controller
     }
 
     #endregion
+
+    public function dashboard()
+    {
+
+        $data["TotalesEstado"] = Inspeccion::select('Estado', DB::raw('count(*) as total'))
+            ->groupBy('Estado')
+            ->pluck('total', 'Estado')->all();
+
+        $data["TotalesMes"] = [
+            "Total" =>  Inspeccion::count(),
+            "MesActual" => Inspeccion::whereMonth('created_at', Carbon::now()->month)->count(),
+            "MesAnterior" => Inspeccion::whereMonth('created_at', Carbon::now()->month - 1)->count()
+        ];
+
+        return response()->json($data, 200);
+    }
 
     public function upload(Request $request, $id)
     {
@@ -356,7 +373,8 @@ class InspeccionController extends Controller
                 return $query;
             },
             'colaborador',
-            'formulario'
+            'formulario',
+            'observacions'
         ])->where('ID', $id)->first();
 
         $data = Rseccion::with('rcomponentes')->where('IDInspeccion', $Inspeccion->ID)->get();

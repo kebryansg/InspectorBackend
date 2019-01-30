@@ -2,11 +2,8 @@
 
 date_default_timezone_set('America/Guayaquil');
 
-use GrahamCampbell\Flysystem\Facades\Flysystem;
-use Illuminate\Support\Facades\Mail;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
-
 
 $serviceAccount = ServiceAccount::fromJsonFile(dirname(__DIR__) . '/app/secret/inspector-7933a.json');
 $firestore = (new Factory)
@@ -104,6 +101,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     $router->get('acteconomica', ["uses" => "ActividadEconomicaController@index"]);
     $router->get('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@show']);
+    $router->get('sync_acteconomica/', ['uses' => 'ActividadEconomicaController@updateFirebase']);
     $router->post('acteconomica', ['uses' => 'ActividadEconomicaController@store']);
     $router->put('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@update']);
     $router->delete('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@destroy']);
@@ -157,19 +155,25 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->put('inspeccion/{id}/', ['uses' => 'InspeccionController@update']);
     $router->delete('inspeccion/{id}/', ['uses' => 'InspeccionController@destroy']);
     $router->put('inspeccion/{id}/coladorador/{colaborador}/', ['uses' => 'InspeccionController@inspeccion_colaborador']);
+
+    // PDF
+    $router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF'] );
+    $router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF'] );
+    $router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail'] );
+
     #endregion
 
     #region Formulario
     $router->get('formulario', ["uses" => "FormularioController@index"]);
     $router->get('formulario_combo', ["uses" => "FormularioController@combo"]);
-//    $router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
+    $router->get('formulario_async', ["uses" => "FormularioController@syncFormularioFirebase"]);
     $router->get('formulario/{id}/', ['uses' => 'FormularioController@show']);
     $router->post('formulario', ['uses' => 'FormularioController@store']);
     $router->put('formulario/{id}', ['uses' => 'FormularioController@update']);
     $router->delete('formulario/{id}', ['uses' => 'FormularioController@destroy']);
     #endregion
 
-    ##region Seccion
+    #region Seccion
     $router->get('seccion', ["uses" => "SeccionController@index"]);
     $router->get('seccion_combo', ["uses" => "SeccionController@combo"]);
     $router->get('seccion/{id}', ['uses' => 'SeccionController@show']);
@@ -178,7 +182,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->delete('seccion/{id}', ['uses' => 'SeccionController@destroy']);
     #endregion
 
-    ##region Componente
+    #region Componente
     $router->get('componente', ["uses" => "ComponenteController@index"]);
     $router->get('componente/{id}', ['uses' => 'ComponenteController@show']);
     $router->post('componente', ['uses' => 'ComponenteController@store']);
@@ -213,58 +217,45 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('device/{id}/', ['uses' => 'DeviceController@show']);
     $router->put('device/{id}/', ['uses' => 'DeviceController@aprobarDevice']);
     #endregion
+
+    #region Dashboard
+    $router->get('dashboard/', ["uses" => "InspeccionController@dashboard"]);
+    #endregion
+
 });
 
 // Registrar Dispositivo sin Autentificar
 $router->post('reg_device', ["uses" => "DeviceController@store"]);
 
 // Middleware Dispositivo Registrado
-#region DownloadInfo
-$router->get('inspeccion_sync', function () {
-    $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')
-        ->get([
-            'Inspeccion.ID',
-            'Inspeccion.FechaTentativa',
-            'IDEmpresa',
-            'Inspeccion.IDColaborador',
-            'Inspeccion.IDFormulario',
-            'Inspeccion.Estado'
-        ]);
-    $Empresa = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get();
+// Routes Device
+$router->group(['middleware' => ['device']], function () use ($router) {
 
-    foreach ($Inspeccions as $Inspeccion) {
-        $Inspeccion["Empresa"] = $Empresa->firstWhere('ID', $Inspeccion['IDEmpresa']);
-        unset($Inspeccion['IDEmpresa']);
-    }
+    $router->get('inspeccion_sync', ["uses" => "DeviceController@SyncInspeccion"]);
 
-    return response()->json($Inspeccions, 200);
+    $router->get('colaborador_sync', ["uses" => "DeviceController@SyncColaborador"]);
+
+    $router->get('form_sync', ["uses" => "DeviceController@SyncFormulario"]);
+
+    $router->get('acteconomica_sync', ["uses" => "DeviceController@SyncActEconomica"]);
+
+
+    // SyncInspeccion - Recibir información del Dispositivo
+    $router->put('device/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionDevice']);
+
 });
 
-$router->get('colaborador_sync', function () {
-    $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)->get();
-    $rows = [];
-    foreach ($colaboradors as $Colaborador) {
-        $rows[] = [
-            'ID' => $Colaborador->ID,
-            'Cedula' => $Colaborador->Cedula,
-            'Email' => $Colaborador->Email,
-            'Nombre' => $Colaborador->ApellidoPaterno . ' ' . $Colaborador->ApellidoMaterno . ' ' . $Colaborador->NombrePrimero,
-            'Created_at' => $Colaborador->created_at->getTimestamp(),
-            'Updated_at' => $Colaborador->updated_at->getTimestamp(),
-        ];
-    }
-    return response()->json($rows, 200);
-});
-#endregion
+// SyncInspeccion - Inspector Sync
+$router->put('firebase/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
+
+// Obtener Anexos segun la Inspección
+$router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
 
 
 /* Pruebas Ionic */
 $router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
-
-$router->get('formulario_async', ["uses" => "FormularioController@syncFormulario"]);
-
-
+/* Pruebas Firebase */
 $router->get('firebase/', function () use ($firestore) {
     $collection = $firestore->collection('colaborador');
     $rows = [];
@@ -274,7 +265,6 @@ $router->get('firebase/', function () use ($firestore) {
 
     return response()->json($rows, 201);
 });
-
 $router->post('firebase/', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
@@ -297,13 +287,3 @@ $router->post('firebase/', function () use ($firestore) {
     }
     return $colaboradors;
 });
-
-
-$router->put('firebase/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
-$router->put('device/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionDevice']);
-$router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
-
-
-$router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF'] );
-$router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF'] );
-$router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail'] );

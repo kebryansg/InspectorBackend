@@ -49,6 +49,9 @@ class FormularioController extends Controller
         return response($Formulario, 201);
     }
 
+    #region CRUD
+
+
     /**
      * Display a listing of the resource.
      *
@@ -147,6 +150,7 @@ class FormularioController extends Controller
         $Formulario->save();
         return response($Formulario, 201);
     }
+    #endregion
 
     /**
      * Display a listing of the resource.
@@ -334,35 +338,74 @@ class FormularioController extends Controller
     }
 
 
-    public function syncFormulario(Request $request){
+    #region Sync Firebase - Device
+
+    public function syncFormularioFirebase(Request $request)
+    {
+
+        try {
+            $query = Formulario::with(
+                ['seccions.componentes' => function ($query) {
+                    return $query->where('Estado', 'ACT');
+                }])
+                ->has('seccions.componentes')
+                ->where('Formulario.Estado', 'ACT');
+
+            /* Agregar condición para saber si es solo uno  */
+            if ($request->input('ID')) {
+                $query->where('Formulario.ID', $request->input('ID'));
+            }
+            $Formularios = $query->get();
+
+            foreach ($Formularios as $formulario) {
+                $this->uploadFirebase($formulario);
+                $data = json_encode($formulario->toArray()["seccions"], JSON_PRETTY_PRINT);
+                (new Utilidad())->uploadFile($data,'Formulario/form_' . $formulario["ID"] . '.json');
+
+//                $storage = $this->firebase->getStorage();
+//                $bucket = $storage->getBucket();
+//
+//                $bucket->upload(
+//                    $data,
+//                    [
+//                        'name' => 'Formulario/form_' . $formulario["ID"] . '.json'
+//                    ]
+//                );
+            }
+
+            return response()->json([
+                "status" => true
+            ], 200);
+        } catch (\Exception $ex) {
+            return response()->json([
+                "status" => false,
+                "message" => $ex->getMessage()
+            ], 200);
+        }
+
+    }
+
+    public function syncFormularioDevice(Request $request)
+    {
 
         $query = Formulario::with(
             ['seccions.componentes' => function ($query) {
                 return $query->where('Estado', 'ACT');
             }])
+            ->has('seccions.componentes')
             ->where('Formulario.Estado', 'ACT');
-        if($request->input('ID')){
+
+        /* Agregar condición para saber si es solo uno  */
+        if ($request->input('ID')) {
             $query->where('Formulario.ID', $request->input('ID'));
         }
         $Formularios = $query->get();
 
-        foreach ($Formularios as $formulario){
-            $data = json_encode($formulario->toArray()["seccions"], JSON_PRETTY_PRINT);
-            $storage = $this->firebase->getStorage();
-            $bucket = $storage->getBucket();
-
-            $bucket->upload(
-                $data,
-                [
-                    'name' => 'Formulario/form_'. $formulario["ID"].'.json'
-                ]
-            );
-        }
-
-        return response()->json('true', 200);
-
+        return response()->json($Formularios, 200);
 
     }
+
+    #endregion
 
 
 }

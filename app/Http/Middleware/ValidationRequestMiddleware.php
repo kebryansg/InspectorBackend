@@ -21,7 +21,7 @@ class ValidationRequestMiddleware
             // Post-Middleware Action
             return $response;
         }
-        return response()->json(['error' => 'Type Not valid'], 401);
+        return response()->json(['error' => 'Content-Type Not valid'], 401);
 
     }
 }

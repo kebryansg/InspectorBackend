@@ -139,6 +139,23 @@
                 </div>
             </div>
 
+            <!-- Observaciones -->
+            <div class="row">
+                <div class="col-xs-12">
+
+                    @if(count($Inspeccion->observacions) > 0)
+
+                        <span class="title-main">Observaciones</span>
+                        <ul>
+                            @foreach ($Inspeccion->observacions as $observacion)
+                                <li>{{ $observacion->Observacion  }}</li>
+                            @endforeach
+                        </ul>
+
+                    @endif
+                </div>
+            </div>
+
             <div class="page-break"></div>
 
             <!-- Anexos -->

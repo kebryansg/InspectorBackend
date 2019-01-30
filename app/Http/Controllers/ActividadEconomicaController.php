@@ -18,6 +18,8 @@ class ActividadEconomicaController extends Controller
         return response($Acteconomica, 201);
     }
 
+    #region CRUD
+
     /**
      * Display a listing of the resource.
      *
@@ -103,5 +105,23 @@ class ActividadEconomicaController extends Controller
         $Acteconomica->Estado = 'INA';
         $Acteconomica->save();
         return response($Acteconomica, 201);
+    }
+
+    #endregion
+
+    public function updateFirebase(Request $request)
+    {
+        $rows = Acteconomica::with(
+            ['tipoacteconomicas.clasificacions' => function ($query) {
+                return $query->whereNotNull('IDFormulario');
+            }])
+            ->has('tipoacteconomicas.clasificacions')
+            ->get()
+            ->toArray();
+        $path = 'ActEconomica/data.json';
+        (new Utilidad())->uploadFile($rows, $path);
+        return response()->json([
+            "status" => true
+        ], 201);
     }
 }
