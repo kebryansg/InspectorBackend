@@ -25,7 +25,8 @@ $app = new Laravel\Lumen\Application(
 
  $app->withFacades(true, [
      'GrahamCampbell\Flysystem\Facades\Flysystem' => 'Flysystem',
-     'Intervention\Image\Facades\Image' => 'Image'
+     'Intervention\Image\Facades\Image' => 'Image',
+     'Barryvdh\DomPDF\Facade' => 'PDF',
  ]);
 
  $app->withEloquent();
@@ -106,6 +107,12 @@ $app->register(GrahamCampbell\Flysystem\FlysystemServiceProvider::class);
 // Intervention Image Package
 $app->register(Intervention\Image\ImageServiceProvider::class);
 
+// PDF
+$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
+
+//Mail
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
@@ -130,6 +137,8 @@ $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 $app->configure('auth');
 $app->configure('services');
+$app->configure('mail');
+$app->configure('dompdf');
 
 
 return $app;

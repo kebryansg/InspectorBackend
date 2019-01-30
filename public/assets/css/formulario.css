@@ -1,0 +1,81 @@
+.page-break {
+    page-break-after: always;
+}
+
+/**
+   Set the margins of the page to 0, so the footer and the header
+   can be of the full height and width !
+**/
+@page {
+    margin: 0cm 0cm;
+}
+
+/** Define now the real margins of every page in the PDF **/
+body {
+    margin-top: 2cm;
+    margin-left: 2cm;
+    margin-right: 2cm;
+    margin-bottom: 2cm;
+}
+
+/** Define the footer rules **/
+footer {
+    position: fixed;
+    bottom: 0cm;
+    left: 0cm;
+    right: 2cm;
+    height: 2cm;
+
+    /** Extra personal styles **/
+    /*background-color: #03a9f4;*/
+    /*color: white;*/
+    text-align: right;
+    line-height: 1.5cm;
+}
+
+.img-logo {
+    height: 75px;
+}
+
+.head-institucion td {
+    background-color: white;
+    padding: 0;
+}
+
+table {
+    width: 100%;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th {
+    padding: 10px;
+    text-align: left;
+    border-bottom: #ffffff solid 2px;
+}
+
+td {
+    padding-left: 5px;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+img {
+    height: 250px;
+    margin: 5px;
+}
+
+.title-main {
+    font-weight: bold;
+    text-decoration: underline;
+    padding: 0 7px;
+    font-size: 20px;
+}
+
+footer .pagenum:before {
+    content: counter(page);
+}

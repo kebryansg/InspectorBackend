@@ -18,7 +18,8 @@ class Utilidad
         }
     }
 
-    public static function getPathPublic(){
+    public static function getPathPublic()
+    {
         return __DIR__ . '/../../../public';
     }
 
@@ -31,7 +32,7 @@ class Utilidad
 
     public static function ListarDirectorioInspeccion($Inspeccion)
     {
-        $path = 'Inspeccion/insp_' . ($Inspeccion). '/Anexos';
+        $path = 'Inspeccion/insp_' . ($Inspeccion) . '/Anexos';
         $contents = Flysystem::listContents($path, true);
         return $contents;
     }
@@ -43,17 +44,17 @@ class Utilidad
         return $contents_stream;
     }
 
-    public static function base64Img($path){
+    public static function base64Img($path)
+    {
 //        $image = 'cricci.jpg';
 //        $stream = Flysystem::readStream($path);
 //        $imageData = base64_encode(stream_get_contents($stream));
 //        return 'data:image/png;base64,'.$imageData;
 
 
-        return (string) Image::make($path)->resize(320, 240)->encode('data-url');
+        return (string)Image::make($path)->resize(320, 240)->encode('data-url');
 
     }
-
 
 
     /* Anotaciones */

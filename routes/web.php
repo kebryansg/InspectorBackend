@@ -2,6 +2,8 @@
 
 date_default_timezone_set('America/Guayaquil');
 
+use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Mail;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
 
@@ -150,6 +152,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('inspeccion', ["uses" => "InspeccionController@index"]);
     $router->get('inspeccion/{id}/', ['uses' => 'InspeccionController@show']);
     $router->get('inspeccion/{id}/async', ['uses' => 'InspeccionController@upload']);
+    $router->get('inspeccion/{id}/result', ['uses' => 'InspeccionController@resultFormulario']);
     $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
     $router->put('inspeccion/{id}/', ['uses' => 'InspeccionController@update']);
     $router->delete('inspeccion/{id}/', ['uses' => 'InspeccionController@destroy']);
@@ -271,6 +274,7 @@ $router->get('firebase/', function () use ($firestore) {
 
     return response()->json($rows, 201);
 });
+
 $router->post('firebase/', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
@@ -294,11 +298,12 @@ $router->post('firebase/', function () use ($firestore) {
     return $colaboradors;
 });
 
-/* Pruebas Storage */
-// $router->get('storage/', [ 'uses' => 'InspeccionController@create' ]);
 
 $router->put('firebase/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
 $router->put('device/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionDevice']);
 $router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
 
 
+$router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF'] );
+$router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF'] );
+$router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail'] );

@@ -6,19 +6,18 @@ use App\Models\Clasificacion;
 use App\Models\Empresa;
 use App\Models\Formulario;
 use App\Models\Inspeccion;
+use App\Models\Observacion;
 use App\Models\Parametro;
 use App\Models\Rseccion;
 use Carbon\Carbon;
-//use Firebase;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Mail;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
 use Kreait\Firebase;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class InspeccionController extends Controller
 {
@@ -37,6 +36,8 @@ class InspeccionController extends Controller
             ->withServiceAccount($serviceAccount)
             ->create();
     }
+
+    #region CRUD
 
     /**
      * Display a listing of the resource.
@@ -130,7 +131,17 @@ class InspeccionController extends Controller
      */
     public function show($id)
     {
-        //
+        $Inspeccion = Inspeccion::with([
+            'empresa' => function ($query) {
+                $query->with('sector', 'clasificacion');
+                return $query;
+            },
+            'colaborador',
+            'formulario'
+        ])
+            ->where('ID', $id)
+            ->first();
+        return response()->json($Inspeccion, 200);
     }
 
     /**
@@ -181,7 +192,7 @@ class InspeccionController extends Controller
             DB::rollBack();
             return response()->json($exception->getMessage(), 500);
         }
-        $this->uploadFirebase($Inspeccion);
+        $this->uploadFirebase($Inspeccion, 'Y-m-d H:i:s+');
         return response()->json($Inspeccion, 201);
 
     }
@@ -200,6 +211,8 @@ class InspeccionController extends Controller
         ]);
         return response()->json($Inspeccion, 201);
     }
+
+    #endregion
 
     public function upload(Request $request, $id)
     {
@@ -243,7 +256,7 @@ class InspeccionController extends Controller
         }
     }
 
-
+    #region "Sync Firebase - Device"
     public function syncInspeccionDevice(Request $request, $id)
     {
         $Inspeccion = Inspeccion::find($id);
@@ -253,24 +266,13 @@ class InspeccionController extends Controller
 
         $rows = $request->input('result');
         $this->saveResult($rows, $id);
+        $this->saveObservacions($request->input('Observacions'), $Inspeccion);
 
 
         return response()->json([
             "status" => true,
             "data" => $Inspeccion
         ], 201);
-    }
-
-    private function saveResult($rows, $id)
-    {
-        foreach ($rows as $row) {
-            $Seccion = new Rseccion();
-            $Seccion->fill($row);
-            $Seccion->IDInspeccion = $id;
-            $Seccion->save();
-            $Seccion->rcomponentes()->createMany($row['componentes']);
-
-        }
     }
 
     public function syncInspeccionFirebase(Request $request, $id)
@@ -289,7 +291,7 @@ class InspeccionController extends Controller
                 if ($type !== 'json') $object->downloadToFile($destination);
                 else {
                     $stream = $object->downloadAsStream();
-                    $rows = json_decode($stream->getContents(),true);
+                    $rows = json_decode($stream->getContents(), true);
                     $this->saveResult($rows, $id);
                 }
 
@@ -306,6 +308,35 @@ class InspeccionController extends Controller
 
     }
 
+    private function saveResult($rows, $id)
+    {
+        foreach ($rows as $row) {
+            $Seccion = new Rseccion();
+            $Seccion->fill($row);
+            $Seccion->IDInspeccion = $id;
+            $Seccion->save();
+            $Seccion->rcomponentes()->createMany($row['componentes']);
+        }
+    }
+
+    private function saveObservacions($Observacions, $Inspeccion)
+    {
+        Observacion::where('IDInspeccion', $Inspeccion->ID)->delete();
+        $rows = [];
+        foreach ($Observacions as $observacion) {
+            $rows[] = ["Observacion" => $observacion];
+        }
+        $Inspeccion->observacions()->createMany($rows);
+    }
+
+    public function resultFormulario(Request $request, $id)
+    {
+        $data = Rseccion::with('rcomponentes')->where('IDInspeccion', $id)->get();
+        return response()->json($data, 200);
+    }
+
+    #endregion
+
     public function readAnexos(Request $request, $id)
     {
         $streams = [];
@@ -316,4 +347,75 @@ class InspeccionController extends Controller
         return response()->json($streams, 200);
     }
 
+    #region PDF
+    private function generatePDF($id)
+    {
+        $Inspeccion = Inspeccion::with([
+            'empresa' => function ($query) {
+                $query->with('sector', 'clasificacion');
+                return $query;
+            },
+            'colaborador',
+            'formulario'
+        ])->where('ID', $id)->first();
+
+        $data = Rseccion::with('rcomponentes')->where('IDInspeccion', $Inspeccion->ID)->get();
+
+        $contents = Flysystem::listContents('/Inspeccion/insp_' . $Inspeccion->ID . '/Anexos/', true);
+
+        $Anexos = array();
+        foreach ($contents as $object) {
+            $Anexos[] = $object['path'];
+        }
+        return PDF::loadView('form_inspeccion', array('formulario' => $data, 'Anexos' => $Anexos, 'Inspeccion' => $Inspeccion))->setPaper('a4');
+    }
+
+    public function viewPDF(Request $request, $id)
+    {
+        $pdf = $this->generatePDF($id);
+        return $pdf->stream('download.pdf');
+    }
+
+    public function downloadPDF(Request $request, $id)
+    {
+        $pdf = $this->generatePDF($id);
+        return $pdf->download("Insp_$id.pdf");
+    }
+
+    #endregion
+
+    #region Mail
+    public function sendMail(Request $request, $id)
+    {
+        if (!Utilidad::Online())
+            return response()->json([
+                "status" => false,
+                "message" => "No hay conexión a Internet"
+            ], 201);
+
+        $Inspeccion = Inspeccion::with('empresa')->where('ID', $id)->first();
+
+        if ($Inspeccion->Empresa->Email) {
+            $pdf = $this->generatePDF($id);
+            $email = $Inspeccion->Empresa->Email;
+            Mail::send('mail', [], function ($message) use ($pdf, $email) {
+
+                $message->to($email)
+                    ->subject('Inspector Web - Mail')
+                    ->attachData($pdf->output(), 'Formulario.pdf');
+                return response()->json([
+                    "status" => true
+                ], 201);
+
+            });
+        } else {
+            return response()->json([
+                "status" => false,
+                "message" => "La empresa no cuenta con un correo registrado."
+            ], 201);
+        }
+
+
+    }
+    #endregion
 }
