@@ -96,7 +96,10 @@
                         <tr>
 
                             <td class="text-bold">Clasificación</td>
-                            <td colspan="3">{{ $Inspeccion->Empresa->clasificacion->Descripcion }}</td>
+                            <td >{{ $Inspeccion->Empresa->clasificacion->Descripcion }}</td>
+
+                            <td class="text-bold">Teléfono</td>
+                            <td >{{ $Inspeccion->Empresa->Telefono }}</td>
 
                         </tr>
                         <tr>

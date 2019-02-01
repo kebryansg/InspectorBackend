@@ -93,7 +93,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('clasificacion', ["uses" => "ClasificacionController@index"]);
     $router->get('clasificacion_combo', ["uses" => "ClasificacionController@combo"]);
     $router->get('clasificacion_ls_asign', ["uses" => "ClasificacionController@listAsignFormulario"]);
-    $router->post('clasificacion_ls_asign/{form}/', ["uses" => "ClasificacionController@store_listAsignFormulario"]);
+    $router->post('clasificacion_ls_asign/{form}', ["uses" => "ClasificacionController@store_listAsignFormulario"]);
     $router->get('clasificacion/{id}', ['uses' => 'ClasificacionController@show']);
     $router->post('clasificacion', ['uses' => 'ClasificacionController@store']);
     $router->put('clasificacion/{id}', ['uses' => 'ClasificacionController@update']);
@@ -198,13 +198,9 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Formulario-Seccion
 //    $router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
-    $router->get('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_config"]);
-    $router->post('formulario/{form}/seccion/config/', ["uses" => "FormularioController@seccion_formulario_store"]);
+    $router->get('formulario/{form}/seccion/config', ["uses" => "FormularioController@seccion_formulario_config"]);
+    $router->post('formulario/{form}/seccion/config', ["uses" => "FormularioController@seccion_formulario_store"]);
 
-
-//    $router->get('formularios/{form}/seccion', ["uses" => "FormularioController@seccion_formulario"]);
-//    $router->get('formularios/{form}/component', ["uses" => "FormularioController@component_formulario"]);
-//    $router->post('formularios/{id}/seccion', ["uses" => "FormularioController@seccion_store"]);
     #endregion
 
     #region TipoComponente
@@ -214,12 +210,12 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Device
     $router->get('device', ["uses" => "DeviceController@index"]);
-    $router->get('device/{id}/', ['uses' => 'DeviceController@show']);
-    $router->put('device/{id}/', ['uses' => 'DeviceController@aprobarDevice']);
+    $router->get('device/{id}', ['uses' => 'DeviceController@show']);
+    $router->put('device/{id}', ['uses' => 'DeviceController@aprobarDevice']);
     #endregion
 
     #region Dashboard
-    $router->get('dashboard/', ["uses" => "InspeccionController@dashboard"]);
+    $router->get('dashboard', ["uses" => "InspeccionController@dashboard"]);
     #endregion
 
 });
@@ -246,7 +242,7 @@ $router->group(['middleware' => ['device']], function () use ($router) {
 });
 
 // SyncInspeccion - Inspector Sync
-$router->put('firebase/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
+$router->put('firebase/inspeccion/{id}', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
 
 // Obtener Anexos segun la Inspección
 $router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
