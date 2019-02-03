@@ -388,6 +388,19 @@ class InspeccionController extends Controller
         return PDF::loadView('form_inspeccion', array('formulario' => $data, 'Anexos' => $Anexos, 'Inspeccion' => $Inspeccion))->setPaper('a4');
     }
 
+    public function generateSolicitudPDF($id){
+        $Inspeccion = Inspeccion::with([
+            'empresa' => function ($query) {
+                $query->with('sector.parroquium', 'clasificacion.tipoacteconomica.acteconomica');
+                return $query;
+            },
+            'colaborador',
+            'formulario',
+            'observacions'
+        ])->where('ID', $id)->first();
+        return PDF::loadView('solicitud', array('Inspeccion' => $Inspeccion))->setPaper('a4')->stream();
+    }
+
     public function viewPDF(Request $request, $id)
     {
         $pdf = $this->generatePDF($id);

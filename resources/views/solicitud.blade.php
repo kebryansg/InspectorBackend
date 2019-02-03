@@ -17,25 +17,32 @@
         @endphp
 
         <header>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>
-                            <img src="assets/logo/LOGO_BOMBEROS_BUENA_FE_TRANSPARENTE.png" class="img-logo">
-                        </td>
-                        <td class="text-center" style="vertical-align: center;">
-                            <h4 class="text-bold" style="padding: 0; margin: 0">{{ $Institucion->Nombre  }}</h4>
-                            <small>RUC: {{ $Institucion->Ruc  }}</small>
-                            <br>
-                            <small>BUENA FE - LOS RIOS</small>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <img src="assets/logo/LOGO_BOMBEROS_BUENA_FE_TRANSPARENTE.png" class="img-logo">
+            <div class="encabezado">
+                <div class="row" >
+                    <div class="col-xs-12 text-center">
+                        <h4 class="text-bold" style="padding: 0; margin: 0">{{ $Institucion->Nombre  }}</h4>
+                        <small>RUC: {{ $Institucion->Ruc  }}</small>
+                        <br>
+                        <small>BUENA FE - LOS RIOS</small>
+                    </div>
+                </div>
+                <hr class="hr-oficio" >
+            </div>
+
         </header>
 
         <footer>
+            <!-- Nota -->
             <div class="row">
+                <div class="col-xs-12">
+                    <p> <strong>Nota:</strong>
+                        El {{ $Institucion->Nombre  }}, deslinda responsabilidad si los datos proporcionados por el usuario son erróneos.
+                    </p>
+                </div>
+            </div>
+            <hr class="hr-oficio">
+            <div class="row text-center">
                 {{--Pág. <span class="pagenum"></span>--}}
                 <span>Dirección: {{ $Institucion->Direccion }}</span>
                 <br>
@@ -47,20 +54,22 @@
 
         <main>
             <div class="body-main">
+                <!-- Titulo -->
                 <div class="row">
                     <div class="col-xs-12 text-center">
-                        <h5 >SOLICITUD DE INSPECCIÓN</h5>
+                        <h4 class="text-bold">SOLICITUD DE INSPECCIÓN</h4>
                     </div>
                 </div>
-
+                <!-- Información de solicitud -->
                 <div class="row">
                     <div class="col-xs-12">
-                        <span>Solicitud N° 000567</span>
+                        <span>Solicitud N° {{ $Inspeccion->ID }}</span>
                         <br>
-                        <span>Fecha: 03 de noviembre del 2018 </span>
+                        <span>Fecha: {{ $Inspeccion->created_at->toDateTimeString()  }} </span>
                     </div>
                 </div>
-
+                <br>
+                <!-- Información de solicitud -->
                 <div class="row">
                     <div class="col-xs-12">
                         <span>Señores</span>
@@ -73,14 +82,14 @@
                         <span>En su despacho.-</span>
                     </div>
                 </div>
-
+                <br>
                 <div class="row">
                     <div class="col-xs-12">
                         <span>De mi consideración:</span>
                     </div>
                 </div>
-
-
+                <br>
+                <!-- Petición -->
                 <div class="row">
                     <div class="col-xs-12">
                         <p class="text-justify">
@@ -90,42 +99,44 @@
                         </p>
                     </div>
                 </div>
-
+                <br>
+                <!-- Información Local -->
                 <div class="row">
                     <div class="col-xs-12">
                         <table>
                             <tbody>
 
                                 <tr>
-                                    <td>Nombre Comercial: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Nombre Comercial: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->NombreComercial }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Actividad Económica: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Actividad Económica: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->clasificacion->tipoacteconomica->acteconomica->Descripcion }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Dirección: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Dirección: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->Direccion }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Parroquia: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Parroquia: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->sector->parroquium->Descripcion }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Sector: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Sector: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->sector->Descripcion }}</span></td>
                                 </tr>
                                 <tr>
                                     <td>Referencia: <span class="text-bold text-uppercase"></span></td>
                                 </tr>
                                 <tr>
-                                    <td>Teléfono: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Teléfono de contacto: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->Telefono }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Correo electrónico: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Correo electrónico: <span class="text-bold">{{ $Inspeccion->empresa->Email }}</span></td>
                                 </tr>
 
                             </tbody>
                         </table>
                     </div>
                 </div>
-
+                <br>
+                <!-- Agradecimiento -->
                 <div class="row">
                     <div class="col-xs-12">
                         <p>
@@ -134,7 +145,7 @@
                     </div>
                 </div>
 
-
+                <!-- Firma -->
                 <div class="row">
                     <div class="col-xs-12 text-center text-bold">
                         <span>Atentamente</span>
@@ -143,6 +154,9 @@
                     </div>
                 </div>
 
+                <br>
+                <br>
+                <br>
 
                 <div class="row">
                     <div class="col-xs-12 text-center">
@@ -153,15 +167,6 @@
                         <span>C.I.: <strong>1234567890</strong></span>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <p> <strong>Nota:</strong>
-                            El {{ $Institucion->Nombre  }}, deslinda responsabilidad si los datos proporcionados por el usuario son erróneos.
-                        </p>
-                    </div>
-                </div>
-
 
             </div>
         </main>

@@ -12,7 +12,9 @@ $firestore = (new Factory)
 
 
 $router->get('/', function () use ($router) {
-    return response()->json($router->app->version(), 200);
+//    return response()->json($router->app->version(), 200);
+    $date = \Carbon\Carbon::now()->toDateTimeString();
+    return response()->json($date, 200);
 });
 
 
@@ -293,7 +295,4 @@ $router->post('firebase/', function () use ($firestore) {
     return $colaboradors;
 });
 
-
-$router->get('pdf', function(){
-    return PDF::loadView('solicitud')->stream('download.pdf');
-});
+$router->get('solicitud_pdf/{id}', ["uses" => "InspeccionController@generateSolicitudPDF"]);
