@@ -103,6 +103,15 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     $router->get('rol_modulo/{id}', ["uses" => "RolController@rol_modulo"]);
 
+
+    $router->get('usuario', ["uses" => "RolController@index"]);
+    $router->get('usuario/{id}', ['uses' => 'RolController@show']);
+    $router->post('usuario', ['uses' => 'RolController@store']);
+    $router->put('usuario/{id}', ['uses' => 'RolController@update']);
+    $router->delete('usuario/{id}', ['uses' => 'RolController@destroy']);
+
+
+
     #endregion
 
     #region ActividadEconómica
