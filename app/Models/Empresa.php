@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Empresa
  * 
  * @property int $ID
- * @property string $Descripcion
  * @property int $IDClasificacion
  * @property int $IDEntidad
  * @property int $IDSector
@@ -54,7 +53,6 @@ class Empresa extends Eloquent
 	];
 
 	protected $fillable = [
-		'Descripcion',
 		'IDClasificacion',
 		'IDEntidad',
 		'IDSector',

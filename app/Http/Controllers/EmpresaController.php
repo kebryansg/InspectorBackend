@@ -14,14 +14,15 @@ class EmpresaController extends Controller
      */
     public function index(Request $request)
     {
-        $Empresas = Empresa::with('clasificacion.tipoacteconomica', 'sector')
-            ->where('Estado', 'ACT')
-            ->where([
+        $query = Empresa::with('clasificacion.tipoacteconomica', 'sector')
+            ->where('Estado', 'ACT');
+        if ($request->input('search'))
+            $query->where([
                 ['RUC', 'like', '%' . $request->input('search') . '%'],
                 ['RazonSocial', 'like', '%' . $request->input('search') . '%'],
                 ['NombreComercial', 'like', '%' . $request->input('search') . '%'],
-            ])
-            ->paginate($request->input('psize'));
+            ]);
+        $Empresas = $query->paginate($request->input('psize'));
         return response($Empresas, 201);
     }
 
@@ -43,12 +44,10 @@ class EmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
             $Empresa = new Empresa();
             $Empresa->fill($request->all());
             $Empresa->save();
             return response($Empresa, 201);
-        }
     }
 
     /**
@@ -59,15 +58,18 @@ class EmpresaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Empresa = Empresa::find($id)
-            ->join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
-            ->join('TipoActEconomica', 'TipoActEconomica.ID', 'Clasificacion.IDTipoActEcon')
-            ->join('ActEconomica', 'ActEconomica.ID', 'TipoActEconomica.IDActEconomica')
-            ->join('Sector', 'Sector.ID', 'IDSector')
-            ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
-            ->join('Canton', 'Canton.ID', 'IDCanton')
-            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
-            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
+//        $Empresa = Empresa::join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
+//            ->join('TipoActEconomica', 'TipoActEconomica.ID', 'Clasificacion.IDTipoActEcon')
+//            ->join('ActEconomica', 'ActEconomica.ID', 'TipoActEconomica.IDActEconomica')
+//            ->join('Sector', 'Sector.ID', 'IDSector')
+//            ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
+//            ->join('Canton', 'Canton.ID', 'IDCanton')
+//            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
+//            ->where('Empresa.ID', $id)
+//            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
+
+
+        $Empresa = Empresa::with('clasificacion', 'entidad', 'sector')->find($id);
 
         return response($Empresa, 201);
     }
