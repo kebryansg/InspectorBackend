@@ -7,13 +7,12 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/solicitud.css">
-        <title>Formulario</title>
+        <title>Solicitud N° {{ $Inspeccion->ID }}</title>
     </head>
     <body>
 
         @php
             $Institucion = \App\Models\Institucion::first();
-
         @endphp
 
         <header>

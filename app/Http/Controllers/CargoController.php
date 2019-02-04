@@ -14,11 +14,8 @@ class CargoController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::paginate($request->input('psize'));
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Cargo = Cargo::paginate($request->input('psize'));
+        return response($Cargo, 201);
     }
 
     /**
@@ -50,13 +47,10 @@ class CargoController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Cargo = new Cargo();
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Cargo = new Cargo();
+        $Cargo->fill($request->all());
+        $Cargo->save();
+        return response($Cargo, 201);
     }
 
     /**
@@ -67,11 +61,8 @@ class CargoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Cargo = Cargo::find($id);
+        return response($Cargo, 201);
     }
 
     /**
@@ -94,13 +85,10 @@ class CargoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->fill($request->all());
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Cargo = Cargo::find($id);
+        $Cargo->fill($request->all());
+        $Cargo->save();
+        return response($Cargo, 201);
     }
 
     /**
@@ -111,12 +99,9 @@ class CargoController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Cargo = Cargo::find($id);
-            $Cargo->Estado = 'INA';
-            $Cargo->save();
-            return response($Cargo, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Cargo = Cargo::find($id);
+        $Cargo->Estado = 'INA';
+        $Cargo->save();
+        return response($Cargo, 201);
     }
 }

@@ -93,6 +93,18 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #endregion
 
+    #region Sistema
+    $router->get('rol', ["uses" => "RolController@index"]);
+//    $router->get('rol_combo', ["uses" => "RolController@combo"]);
+    $router->get('rol/{id}', ['uses' => 'RolController@show']);
+    $router->post('rol', ['uses' => 'RolController@store']);
+    $router->put('rol/{id}', ['uses' => 'RolController@update']);
+    $router->delete('rol/{id}', ['uses' => 'RolController@destroy']);
+
+    $router->get('rol_modulo/{id}', ["uses" => "RolController@rol_modulo"]);
+
+    #endregion
+
     #region ActividadEconómica
     $router->get('tipoact', ["uses" => "TipoActEconomicaController@index"]);
     $router->get('tipoact_combo', ["uses" => "TipoActEconomicaController@combo"]);
@@ -229,6 +241,19 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('dashboard', ["uses" => "InspeccionController@dashboard"]);
     #endregion
 
+    // Menu Items
+    $router->get('menu_items', function (Illuminate\Http\Request $request) {
+        $Modulos = \App\Models\Modulo::with('modulos')->whereNull('IDPadre')->get();
+        return $Modulos;
+    });
+
+    $router->get('menu_items/submodulos', function (Illuminate\Http\Request $request) {
+        $Modulos = \App\Models\Modulo::whereNotNull('IDPadre')->orderBy('IDPadre')->get();
+        return $Modulos;
+    });
+
+
+
 });
 
 // Registrar Dispositivo sin Autentificar
@@ -272,6 +297,7 @@ $router->get('firebase/', function () use ($firestore) {
 
     return response()->json($rows, 201);
 });
+
 $router->post('firebase/', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
