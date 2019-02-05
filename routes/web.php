@@ -12,11 +12,8 @@ $firestore = (new Factory)
 
 
 $router->get('/', function () use ($router) {
-//    return response()->json($router->app->version(), 200);
-    $date = \Carbon\Carbon::now()->toDateTimeString();
-    return response()->json($date, 200);
+    return response()->json($router->app->version(), 200);
 });
-
 
 $router->get('/update_user', function (\Illuminate\Http\Request $request) {
     \App\Models\User::where('ID', 1)->update([
@@ -109,8 +106,6 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->post('usuario', ['uses' => 'RolController@store']);
     $router->put('usuario/{id}', ['uses' => 'RolController@update']);
     $router->delete('usuario/{id}', ['uses' => 'RolController@destroy']);
-
-
 
     #endregion
 

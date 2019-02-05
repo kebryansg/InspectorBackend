@@ -16,14 +16,18 @@ class EmpresaController extends Controller
     {
         $query = Empresa::with('clasificacion.tipoacteconomica', 'sector')
             ->where('Estado', 'ACT');
+
+        if($request->input('modal'))
+            $query->where('EstadoAplicacion', 'P');
+
         if ($request->input('search'))
-            $query->where([
-                ['RUC', 'like', '%' . $request->input('search') . '%'],
-                ['RazonSocial', 'like', '%' . $request->input('search') . '%'],
-                ['NombreComercial', 'like', '%' . $request->input('search') . '%'],
-            ]);
+            $query->where(function ($query) use ($request) {
+                $query->where('RUC', 'like', '%' . $request->input('search') . '%');
+                $query->orWhere('RazonSocial', 'like', '%' . $request->input('search') . '%');
+                $query->orWhere('NombreComercial', 'like', '%' . $request->input('search') . '%');
+            });
         $Empresas = $query->paginate($request->input('psize'));
-        return response($Empresas, 201);
+        return response($Empresas, 200);
     }
 
     /**
@@ -44,10 +48,10 @@ class EmpresaController extends Controller
      */
     public function store(Request $request)
     {
-            $Empresa = new Empresa();
-            $Empresa->fill($request->all());
-            $Empresa->save();
-            return response($Empresa, 201);
+        $Empresa = new Empresa();
+        $Empresa->fill($request->all());
+        $Empresa->save();
+        return response($Empresa, 201);
     }
 
     /**
@@ -69,7 +73,7 @@ class EmpresaController extends Controller
 //            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
 
 
-        $Empresa = Empresa::with('clasificacion', 'entidad', 'sector')->find($id);
+        $Empresa = Empresa::with('clasificacion.tipoacteconomica.acteconomica', 'entidad', 'sector.parroquium.canton')->find($id);
 
         return response($Empresa, 201);
     }

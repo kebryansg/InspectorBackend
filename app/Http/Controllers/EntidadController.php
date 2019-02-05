@@ -14,11 +14,17 @@ class EntidadController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->isJson()) {
-            $Entidad = Entidad::paginate($request->input('psize'));
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $query = Entidad::where('Estado', 'ACT');
+
+        if ($request->input('search'))
+            $query->where(function ($query) use ($request) {
+                $query->where('Identificacion', 'like', '%' . $request->input('search') . '%');
+                $query->orWhere('Nombres', 'like', '%' . $request->input('search') . '%');
+                $query->orWhere('Apellidos', 'like', '%' . $request->input('search') . '%');
+            });
+
+        $Entidad = $query->paginate($request->input('psize'));
+        return response($Entidad, 200);
     }
 
     /**

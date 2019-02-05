@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Celular
  * @property string $Email
  * @property string $Estado
+ * @property string $EstadoAplicacion
  * @property string $Latitud
  * @property string $Longitud
  *
@@ -67,7 +68,8 @@ class Empresa extends Eloquent
 		'Telefono',
 		'Celular',
 		'Email',
-		'Estado'
+		'Estado',
+		'EstadoAplicacion'
 	];
 
 	public function entidad()
