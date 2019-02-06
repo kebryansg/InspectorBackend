@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $ID
  * @property \Carbon\Carbon $FechaInspeccion
  * @property \Carbon\Carbon $FechaTentativa
+ * @property \Carbon\Carbon $FechaPlazo
  * @property string $Estado
  * @property int $IDFormulario
  * @property int $IDEmpresa
@@ -39,7 +40,6 @@ class Inspeccion extends Eloquent
 {
     protected $table = 'inspeccion';
     protected $primaryKey = 'ID';
-//    protected $dateFormat = 'Y-m-d\TH:i:s+';
 
     protected $casts = [
         'IDFormulario' => 'int',
@@ -54,12 +54,14 @@ class Inspeccion extends Eloquent
         'created_at',
         'updated_at',
         'firebase_at',
-        'FechaTentativa' => 'Y-m-d\TH:i:s+'
+        'FechaPlazo',
+        'FechaTentativa'
     ];
 
     protected $fillable = [
         'FechaInspeccion',
         'FechaTentativa',
+        'FechaPlazo',
         'Estado',
         'IDFormulario',
         'IDEmpresa',

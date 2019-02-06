@@ -25,8 +25,8 @@ return [
 
     'encryption' => env('MAIL_ENCRYPTION', 'tls'),
 
-    'username' => env('MAIL_USERNAME', 'inspector.buenafe@gmail.com'),
-    'password' => env('MAIL_PASSWORD', 'qjqhkukzdnykrxnr'),
+    'username' => env('MAIL_USERNAME'),
+    'password' => env('MAIL_PASSWORD'),
     /*
     |--------------------------------------------------------------------------
     | Sendmail System Path

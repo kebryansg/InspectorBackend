@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDClasificacion
  * @property int $IDEntidad
  * @property int $IDSector
- * @property string $Observacion
+ * @property string $Referencia
  * @property string $RUC
  * @property string $RazonSocial
  * @property string $NombreComercial
@@ -57,7 +57,7 @@ class Empresa extends Eloquent
 		'IDClasificacion',
 		'IDEntidad',
 		'IDSector',
-		'Observacion',
+		'Referencia',
 		'RUC',
 		'RazonSocial',
 		'NombreComercial',
@@ -68,6 +68,8 @@ class Empresa extends Eloquent
 		'Telefono',
 		'Celular',
 		'Email',
+		'Latitud',
+		'Longitud',
 		'Estado',
 		'EstadoAplicacion'
 	];

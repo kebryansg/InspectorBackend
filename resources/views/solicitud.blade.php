@@ -13,6 +13,8 @@
 
         @php
             $Institucion = \App\Models\Institucion::first();
+            $Solicitante = $Inspeccion->empresa->entidad->Apellidos. ' ' . $Inspeccion->empresa->entidad->Nombres;
+            $Identificacion = $Inspeccion->empresa->entidad->Identificacion;
         @endphp
 
         <header>
@@ -92,7 +94,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <p class="text-justify">
-                            Yo, <span class="text-bold">ANGEL SEGUNDO CEDEÑO RISCO</span> con RUC. Número <span class="text-bold">1234567890001</span>
+                            Yo, <span class="text-bold">{{ $Solicitante }}</span> con RUC. Número <span class="text-bold">{{ $Identificacion }}</span>
                             solicito a usted se autorice a quien corresponda para que realice la <span class="text-bold">INSPECCION</span> de mi negocio para lo
                             cual detallo la siguiente información:
                         </p>
@@ -156,14 +158,15 @@
                 <br>
                 <br>
                 <br>
+                <br>
 
                 <div class="row">
                     <div class="col-xs-12 text-center">
-                        <span class="text-bold">ANGEL SEGUNDO CEDEÑO RISCO</span>
+                        <span class="text-bold">{{ $Solicitante }}</span>
                         <br>
                         <span>SOLICITANTE</span>
                         <br>
-                        <span>C.I.: <strong>1234567890</strong></span>
+                        <span>C.I.: <strong>{{ $Identificacion }}</strong></span>
                     </div>
                 </div>
 

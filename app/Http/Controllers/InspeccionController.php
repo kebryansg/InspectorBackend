@@ -6,6 +6,7 @@ use App\Models\Clasificacion;
 use App\Models\Empresa;
 use App\Models\Formulario;
 use App\Models\Inspeccion;
+use App\Models\Institucion;
 use App\Models\Observacion;
 use App\Models\Parametro;
 use App\Models\Rseccion;
@@ -193,7 +194,7 @@ class InspeccionController extends Controller
             DB::rollBack();
             return response()->json($exception->getMessage(), 500);
         }
-        $this->uploadFirebase($Inspeccion, 'Y-m-d H:i:s+');
+        $this->uploadFirebase($Inspeccion);
         return response()->json($Inspeccion, 201);
 
     }
@@ -236,19 +237,19 @@ class InspeccionController extends Controller
         $Inspeccion = Inspeccion::find($id);
 //        return response()->json($Inspeccion, 201);
         if (Utilidad::Online()) {
-            $this->uploadFirebase($Inspeccion, 'Y-m-d H:i:s');
+            $this->uploadFirebase($Inspeccion);
             return response()->json('Actualizado', 201);
         }
         return response()->json('No Actualizado', 201);
     }
 
-    private function uploadFirebase(Inspeccion $Inspeccion, $format = 'Y-m-d\TH:i:s+')
+    private function uploadFirebase(Inspeccion $Inspeccion)
     {
         $DataFirebase = null;
         if ($Inspeccion->IDColaborador) {
             $DataFirebase = [
                 'ID' => $Inspeccion->ID,
-                'FechaTentativa' => Carbon::createFromFormat($format, $Inspeccion->FechaTentativa)->format('Y-m-d'),
+                'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
                 'IDFormulario' => $Inspeccion->IDFormulario,
                 'IDColaborador' => $Inspeccion->IDColaborador,
                 'Estado' => $Inspeccion->Estado,
@@ -260,9 +261,12 @@ class InspeccionController extends Controller
                         'NombreComercial',
                         'TipoContribuyente',
                         'Direccion',
+                        'Referencia',
                         'Telefono',
                         'Celular',
-                        'Email'
+                        'Email',
+                        'Latitud',
+                        'Longitud'
                     ])->toArray()
             ];
 
@@ -391,12 +395,12 @@ class InspeccionController extends Controller
     public function generateSolicitudPDF($id){
         $Inspeccion = Inspeccion::with([
             'empresa' => function ($query) {
-                $query->with('sector.parroquium', 'clasificacion.tipoacteconomica.acteconomica');
+                $query->with('sector.parroquium', 'clasificacion.tipoacteconomica.acteconomica', 'entidad');
                 return $query;
             },
             'colaborador',
             'formulario',
-            'observacions'
+            'observacions',
         ])->where('ID', $id)->first();
         return PDF::loadView('solicitud', array('Inspeccion' => $Inspeccion))->setPaper('a4')->stream();
     }
@@ -432,7 +436,8 @@ class InspeccionController extends Controller
             Mail::send('mail', [], function ($message) use ($pdf, $email) {
 
                 $message->to($email)
-                    ->subject('Inspector Web - Mail')
+                    ->from(env('MAIL_USERNAME'),Institucion::first()->Nombre)
+                    ->subject('Informe de Inspección')
                     ->attachData($pdf->output(), 'Formulario.pdf');
                 return response()->json([
                     "status" => true

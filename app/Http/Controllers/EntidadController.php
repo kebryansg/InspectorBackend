@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
 use App\Models\Entidad;
 use Illuminate\Http\Request;
 
@@ -34,11 +35,8 @@ class EntidadController extends Controller
      */
     public function combo(Request $request)
     {
-        if ($request->isJson()) {
-            $Entidad = Entidad::where('Estado', 'ACT')->get();
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Entidad = Entidad::where('Estado', 'ACT')->get();
+        return response($Entidad, 201);
     }
 
     /**
@@ -46,9 +44,10 @@ class EntidadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function listEmpresa(Request $request, $id)
     {
-        //
+        $Empresas = Empresa::where('IDEntidad', $id)->where('EstadoAplicacion', 'P')->get();
+        return response()->json($Empresas, 200);
     }
 
     /**
@@ -86,12 +85,18 @@ class EntidadController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param  string $search
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $search = $request->input('search');
+        $Entidad = Entidad::with([
+            'empresas' => function ($query) {
+                $query->where('EstadoAplicacion', 'P');
+            }
+        ])->where('Identificacion', 'like', "%$search%")->first();
+        return response()->json($Entidad, 200);
     }
 
     /**
