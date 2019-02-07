@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Descripcion
  * @property string $Estado
  * @property string $Atributo
+ * @property string $Result
  * @property int $Obligatorio
  * 
  * @property \App\Models\Tipocomp $tipocomp
@@ -36,6 +37,7 @@ class Componente extends Eloquent
 		'IDSeccion' => 'int',
 		'Obligatorio' => 'int',
         'Atributo' => 'array',
+        'Result' => 'array',
 
 	];
 
@@ -45,6 +47,7 @@ class Componente extends Eloquent
 		'Descripcion',
 		'Estado',
 		'Atributo',
+		'Result',
 		'Obligatorio'
 	];
 

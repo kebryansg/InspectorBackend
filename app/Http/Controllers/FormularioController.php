@@ -359,7 +359,7 @@ class FormularioController extends Controller
 
             foreach ($Formularios as $formulario) {
                 $this->uploadFirebase($formulario);
-                $data = json_encode($formulario->toArray()["seccions"], JSON_PRETTY_PRINT);
+                $data = $formulario->toArray()["seccions"];
                 (new Utilidad())->uploadFile($data,'Formulario/form_' . $formulario["ID"] . '.json');
 
 //                $storage = $this->firebase->getStorage();
