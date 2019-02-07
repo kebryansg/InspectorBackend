@@ -90,7 +90,9 @@ class InspeccionController extends Controller
         $data = $request->all();
         $Inspeccion = new Inspeccion();
 
-//         Validación
+//        whereYear('created_at', '2016')
+
+//      Validación
         if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
             return response()->json([
                 'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
@@ -113,8 +115,6 @@ class InspeccionController extends Controller
             $Inspeccion->IDFormulario = Clasificacion::join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')->where('Empresa.ID', $Inspeccion->IDEmpresa)->first()->IDFormulario;
             $Inspeccion->save();
             DB::commit();
-            if (!Utilidad::Online())
-                return response()->json($Inspeccion, 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json($exception->getMessage(), 201);
@@ -188,8 +188,6 @@ class InspeccionController extends Controller
                 'UsuarioUpdate' => $request->user()->id
             ]);
             DB::commit();
-            if (!Utilidad::Online())
-                return response()->json($Inspeccion, 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json($exception->getMessage(), 500);
@@ -224,7 +222,7 @@ class InspeccionController extends Controller
             ->pluck('total', 'Estado')->all();
 
         $data["TotalesMes"] = [
-            "Total" =>  Inspeccion::count(),
+            "Total" => Inspeccion::count(),
             "MesActual" => Inspeccion::whereMonth('created_at', Carbon::now()->month)->count(),
             "MesAnterior" => Inspeccion::whereMonth('created_at', Carbon::now()->month - 1)->count()
         ];
@@ -235,49 +233,52 @@ class InspeccionController extends Controller
     public function upload(Request $request, $id)
     {
         $Inspeccion = Inspeccion::find($id);
-//        return response()->json($Inspeccion, 201);
-        if (Utilidad::Online()) {
-            $this->uploadFirebase($Inspeccion);
-            return response()->json('Actualizado', 201);
-        }
-        return response()->json('No Actualizado', 201);
+        if (!Utilidad::Online())
+            return response()->json('No Actualizado', 201);
+
+        $this->uploadFirebase($Inspeccion);
+        return response()->json('Actualizado', 201);
     }
 
     private function uploadFirebase(Inspeccion $Inspeccion)
     {
-        $DataFirebase = null;
-        if ($Inspeccion->IDColaborador) {
-            $DataFirebase = [
-                'ID' => $Inspeccion->ID,
-                'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
-                'IDFormulario' => $Inspeccion->IDFormulario,
-                'IDColaborador' => $Inspeccion->IDColaborador,
-                'Estado' => $Inspeccion->Estado,
-                'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
-                    ->first([
-                        'ID',
-                        'RUC',
-                        'RazonSocial',
-                        'NombreComercial',
-                        'TipoContribuyente',
-                        'Direccion',
-                        'Referencia',
-                        'Telefono',
-                        'Celular',
-                        'Email',
-                        'Latitud',
-                        'Longitud'
-                    ])->toArray()
-            ];
+        // Comprobar Internet
+        if (Utilidad::Online()) {
+            $DataFirebase = null;
+            if ($Inspeccion->IDColaborador) {
+                $DataFirebase = [
+                    'ID' => $Inspeccion->ID,
+                    'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
+                    'IDFormulario' => $Inspeccion->IDFormulario,
+                    'IDColaborador' => $Inspeccion->IDColaborador,
+                    'Estado' => $Inspeccion->Estado,
+                    'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
+                        ->first([
+                            'ID',
+                            'RUC',
+                            'RazonSocial',
+                            'NombreComercial',
+                            'TipoContribuyente',
+                            'Direccion',
+                            'Referencia',
+                            'Telefono',
+                            'Celular',
+                            'Email',
+                            'Latitud',
+                            'Longitud'
+                        ])->toArray()
+                ];
 
-            $document = $this->firestore->collection('inspeccion')->document('insp_' . $Inspeccion->ID);
-            $document->set($DataFirebase);
-            $Inspeccion->firebase_at = Carbon::now();
-            $Inspeccion->save();
+                $document = $this->firestore->collection('inspeccion')->document('insp_' . $Inspeccion->ID);
+                $document->set($DataFirebase);
+                $Inspeccion->firebase_at = Carbon::now();
+                $Inspeccion->save();
+            }
         }
     }
 
     #region "Sync Firebase - Device"
+
     public function syncInspeccionDevice(Request $request, $id)
     {
         $Inspeccion = Inspeccion::find($id);
@@ -285,10 +286,12 @@ class InspeccionController extends Controller
         $Inspeccion->MedioUpdate = 'DEV';
         $Inspeccion->save();
 
+        if ($Inspeccion->Estado == 'REI')
+            $this->InsertReinspeccion($Inspeccion);
+
         $rows = $request->input('result');
         $this->saveResult($rows, $id);
         $this->saveObservacions($request->input('Observacions'), $Inspeccion);
-
 
         return response()->json([
             "status" => true,
@@ -300,6 +303,11 @@ class InspeccionController extends Controller
     {
 
         try {
+            // Reinspeccion
+            $Inspeccion = Inspeccion::find($id);
+            if ($Inspeccion->Estado == 'REI')
+                $this->InsertReinspeccion($Inspeccion);
+
             Utilidad::CrearDirectorioInspeccion($id);
 
             $storage = $this->firebase->getStorage();
@@ -350,12 +358,6 @@ class InspeccionController extends Controller
         $Inspeccion->observacions()->createMany($rows);
     }
 
-    public function resultFormulario(Request $request, $id)
-    {
-        $data = Rseccion::with('rcomponentes')->where('IDInspeccion', $id)->get();
-        return response()->json($data, 200);
-    }
-
     #endregion
 
     public function readAnexos(Request $request, $id)
@@ -392,7 +394,8 @@ class InspeccionController extends Controller
         return PDF::loadView('form_inspeccion', array('formulario' => $data, 'Anexos' => $Anexos, 'Inspeccion' => $Inspeccion))->setPaper('a4');
     }
 
-    public function generateSolicitudPDF($id){
+    public function generateSolicitudPDF($id)
+    {
         $Inspeccion = Inspeccion::with([
             'empresa' => function ($query) {
                 $query->with('sector.parroquium', 'clasificacion.tipoacteconomica.acteconomica', 'entidad');
@@ -436,7 +439,7 @@ class InspeccionController extends Controller
             Mail::send('mail', [], function ($message) use ($pdf, $email) {
 
                 $message->to($email)
-                    ->from(env('MAIL_USERNAME'),Institucion::first()->Nombre)
+                    ->from(env('MAIL_USERNAME'), Institucion::first()->Nombre)
                     ->subject('Informe de Inspección')
                     ->attachData($pdf->output(), 'Formulario.pdf');
                 return response()->json([
@@ -453,5 +456,44 @@ class InspeccionController extends Controller
 
 
     }
+
     #endregion
+
+    public function InsertReinspeccion(Inspeccion $Inspeccion)
+    {
+        $InspeccionNew = new Inspeccion();
+        $InspeccionNew->IDRef = $Inspeccion->ID;
+        $InspeccionNew->Estado = 'PEN';
+        $InspeccionNew->IDEmpresa = $Inspeccion->IDEmpresa;
+        $InspeccionNew->IDColaborador = $Inspeccion->IDColaborador;
+        $InspeccionNew->IDFormulario = $Inspeccion->IDFormulario;
+        $InspeccionNew->save();
+        $this->uploadFirebase($InspeccionNew);
+    }
+
+    // Resultado del formulario
+    public function resultFormulario(Request $request, $id)
+    {
+        $data = Rseccion::with('rcomponentes')->where('IDInspeccion', $id)->get();
+        return response()->json($data, 200);
+    }
+
+    public function getInspeccionSync(Request $request)
+    {
+        if (!Utilidad::Online())
+            return response()->json([
+                "status" => false,
+                "count" => 0
+            ], 200);
+
+        $Inspecccions = Inspeccion::whereNotNull('IDColaborador')->whereNull('firebase_at')->get();
+
+        foreach ($Inspecccions as $Inspecccion) {
+            $this->uploadFirebase($Inspecccion);
+        }
+        return response()->json([
+            "status" => true,
+            "count" => count($Inspecccions)
+        ], 200);
+    }
 }

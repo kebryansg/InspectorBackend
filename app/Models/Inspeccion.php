@@ -20,8 +20,11 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDFormulario
  * @property int $IDEmpresa
  * @property int $IDColaborador
+ * @property int $IDRef
  * @property string $Observacion
  * @property string $MedioUpdate
+ * @property string $Latitud
+ * @property string $Longitud
  * @property int $UsuarioRegistro
  * @property int $UsuarioUpdate
  * @property \Carbon\Carbon $created_at
@@ -45,6 +48,7 @@ class Inspeccion extends Eloquent
         'IDFormulario' => 'int',
         'IDEmpresa' => 'int',
         'IDColaborador' => 'int',
+        'IDRef' => 'int',
         'UsuarioRegistro' => 'int',
         'UsuarioUpdate' => 'int'
     ];
@@ -65,11 +69,14 @@ class Inspeccion extends Eloquent
         'Estado',
         'IDFormulario',
         'IDEmpresa',
+        'IDRef',
         'IDColaborador',
         'Observacion',
         'UsuarioRegistro',
         'UsuarioUpdate',
-        'MedioUpdate'
+        'MedioUpdate',
+        'Latitud',
+        'Longitud',
     ];
 
     public function empresa()
