@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $ID
  * @property string $MAC
  * @property string $Token
+ * @property string $TokenFCM
  * @property boolean $Autorizado
  *
  * @package App\Models
@@ -31,6 +32,7 @@ class Device extends Eloquent
 	protected $fillable = [
 		'MAC',
 		'Token',
+		'TokenFCM',
 		'Autorizado'
 	];
 }
