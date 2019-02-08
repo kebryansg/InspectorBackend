@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $IDCompania
  * @property int $IDCargo
  * @property int $IDArea
+ * @property int $IDUser
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $firebase_at
@@ -37,13 +38,14 @@ class Colaborador extends Eloquent
 {
     protected $table = 'colaborador';
     protected $primaryKey = 'ID';
-//	public $timestamps = false;
 
     protected $casts = [
         'IDCompania' => 'int',
         'IDCargo' => 'int',
-        'IDArea' => 'int'
+        'IDArea' => 'int',
+        'IDUser' => 'int'
     ];
+
     protected $dates = [
         'firebase_at',
     ];
@@ -58,8 +60,13 @@ class Colaborador extends Eloquent
         'Estado',
         'IDCompania',
         'IDCargo',
-        'IDArea'
+        'IDArea',
+        'IDUser',
     ];
+
+    public function getNameAttribute(){
+        return "$this->ApellidoPaterno $this->ApellidoMaterno $this->NombrePrimero";
+    }
 
     public function cargo()
     {

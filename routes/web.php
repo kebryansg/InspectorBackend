@@ -25,9 +25,7 @@ $router->get('/update_user', function (\Illuminate\Http\Request $request) {
 
 $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
-    $router->get('/users', function (\Illuminate\Http\Request $request) {
-        return $request->user();
-    });
+    $router->get('users_login', ["uses" => "UsuarioController@getUser"]);
 
     #region Institucion
 
@@ -76,12 +74,13 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Nomina
 
     $router->get('colaborador', ["uses" => "ColaboradorController@index"]);
-    $router->get('colaborador/{id}/', ['uses' => 'ColaboradorController@show']);
-    $router->get('colaborador_inspector/', ['uses' => 'ColaboradorController@inspectores']);
+    $router->get('colaborador/{id}', ['uses' => 'ColaboradorController@show']);
+    $router->get('colaborador_inspector', ['uses' => 'ColaboradorController@inspectores']);
     $router->post('colaborador', ['uses' => 'ColaboradorController@store']);
     $router->get('colaborador/{id}/async', ['uses' => 'ColaboradorController@upload']);
-    $router->put('colaborador/{id}/', ['uses' => 'ColaboradorController@update']);
-    $router->delete('colaborador/{id}/', ['uses' => 'ColaboradorController@destroy']);
+    $router->put('colaborador/{id}', ['uses' => 'ColaboradorController@update']);
+    $router->delete('colaborador/{id}', ['uses' => 'ColaboradorController@destroy']);
+    $router->get('colaborador_notuser', ['uses' => 'ColaboradorController@colaborador_notuser']);
 
     $router->get('cargo', ["uses" => "CargoController@index"]);
     $router->get('cargo_combo', ["uses" => "CargoController@combo"]);
@@ -94,7 +93,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Sistema
     $router->get('rol', ["uses" => "RolController@index"]);
-//    $router->get('rol_combo', ["uses" => "RolController@combo"]);
+    $router->get('rol_combo', ["uses" => "RolController@combo"]);
     $router->get('rol/{id}', ['uses' => 'RolController@show']);
     $router->post('rol', ['uses' => 'RolController@store']);
     $router->put('rol/{id}', ['uses' => 'RolController@update']);
@@ -103,11 +102,11 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('rol_modulo/{id}', ["uses" => "RolController@rol_modulo"]);
 
 
-    $router->get('usuario', ["uses" => "RolController@index"]);
-    $router->get('usuario/{id}', ['uses' => 'RolController@show']);
-    $router->post('usuario', ['uses' => 'RolController@store']);
-    $router->put('usuario/{id}', ['uses' => 'RolController@update']);
-    $router->delete('usuario/{id}', ['uses' => 'RolController@destroy']);
+    $router->get('usuario', ["uses" => "UsuarioController@index"]);
+    $router->get('usuario/{id}', ['uses' => 'UsuarioController@show']);
+    $router->post('usuario', ['uses' => 'UsuarioController@store']);
+    $router->put('usuario/{id}', ['uses' => 'UsuarioController@update']);
+    $router->delete('usuario/{id}', ['uses' => 'UsuarioController@destroy']);
 
     #endregion
 
@@ -186,9 +185,9 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->put('inspeccion/{id}/coladorador/{colaborador}/', ['uses' => 'InspeccionController@inspeccion_colaborador']);
 
     // PDF
-    $router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF'] );
-    $router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF'] );
-    $router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail'] );
+    $router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF']);
+    $router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF']);
+    $router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail']);
 
     #endregion
 
@@ -248,16 +247,17 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #endregion
 
     // Menu Items
-    $router->get('menu_items', function (Illuminate\Http\Request $request) {
-        $Modulos = \App\Models\Modulo::with('modulos')->whereNull('IDPadre')->get();
-        return $Modulos;
-    });
+//    $router->get('menu_items', function (Illuminate\Http\Request $request) {
+//        $Modulos = \App\Models\Modulo::with('modulos')->whereNull('IDPadre')->get();
+//        return $Modulos;
+//    });
+
+    $router->get('menu_items', ["uses" => "RolController@userRol"]);
 
     $router->get('menu_items/submodulos', function (Illuminate\Http\Request $request) {
         $Modulos = \App\Models\Modulo::whereNotNull('IDPadre')->orderBy('IDPadre')->get();
         return $Modulos;
     });
-
 
 
 });

@@ -50,9 +50,10 @@ class RolController extends Controller
         return response($Rol, 201);
     }
 
-    public function saveModulos($rows, $IDRol){
+    public function saveModulos($rows, $IDRol)
+    {
         RolModulo::where('IDRol', $IDRol)->delete();
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             RolModulo::create([
                 "IDRol" => $IDRol,
                 "IDModulo" => $row
@@ -60,10 +61,41 @@ class RolController extends Controller
         }
     }
 
-    public function rol_modulo($id){
+    public function rol_modulo($id)
+    {
         $idsModulo = RolModulo::where('IDRol', $id)->get()->pluck('IDModulo');
         $Modulos = Modulo::whereIn($idsModulo)->get();
-        return response()->json($Modulos,200);
+        return response()->json($Modulos, 200);
+    }
+
+    public function combo()
+    {
+        $Rols = Rol::where('Estado', 'ACT')->get([
+            "ID",
+            "Descripcion"
+        ]);
+        return response()->json($Rols, 200);
+    }
+
+    public function userRol(Request $request)
+    {
+
+        if($request->user()->IDRol == 0){
+            $Modulos = Modulo::with('modulos')->whereNull('IDPadre')->get();
+            return response()->json($Modulos, 200);
+        }
+
+
+        $idModulos = RolModulo::where('IDRol', $request->user()->IDRol)->get()->pluck('IDModulo');
+        $Padres = Modulo::whereIn('ID', $idModulos)->get()->pluck('IDPadre');
+
+        $Modulos = Modulo::with([
+            'modulos' => function ($query) use ($idModulos) {
+                $query->whereIn('ID', $idModulos);
+                return $query;
+            }
+        ])->whereIn('ID', $Padres)->whereNull('IDPadre')->get();
+        return response()->json($Modulos, 200);
     }
 
 }

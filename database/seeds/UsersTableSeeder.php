@@ -14,7 +14,9 @@ class UsersTableSeeder extends Seeder
         factory(App\User::class)->create([
             'name' => 'Administrador Test',
             'email' => 'admin@admin.com',
-            'password' => password_hash('admin1234', PASSWORD_BCRYPT)
+            'IDRol' => 0,
+            'Estado' => 'ADM',
+            'password' => password_hash('12345', PASSWORD_BCRYPT)
         ]);
     }
 }

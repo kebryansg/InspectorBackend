@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Colaborador;
 use App\Models\Parametro;
+use App\User;
 use Carbon\Carbon;
 use Firebase;
 use Illuminate\Http\Request;
@@ -158,6 +159,19 @@ class ColaboradorController extends Controller
         $Colaborador->Estado = 'INA';
         $Colaborador->save();
         return response($Colaborador, 201);
+    }
+
+    public function colaborador_notuser(){
+        $Colaboradors = Colaborador::whereNull('IDUser')->get([
+            'ID',
+            'NombrePrimero',
+            'NombreSegundo',
+            'ApellidoPaterno',
+            'ApellidoMaterno',
+            'Email',
+            'Cedula',
+        ]);
+        return response()->json($Colaboradors, 200);
     }
 
     private function uploadFirebase(Colaborador $Colaborador)
