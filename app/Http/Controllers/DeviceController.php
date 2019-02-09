@@ -75,7 +75,7 @@ class DeviceController extends Controller
     }
 
     public function SyncInspeccion(Request $request){
-        $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')->where('Estado', 'PEN')
+        $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')->where('Estado', 'PEN')->where('InspWeb', 0)
             ->get([
                 'Inspeccion.ID',
                 'Inspeccion.FechaTentativa',
@@ -84,11 +84,14 @@ class DeviceController extends Controller
                 'Inspeccion.IDFormulario',
                 'Inspeccion.Estado'
             ]);
-        $Empresa = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get();
+        $Empresas = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get();
 
         foreach ($Inspeccions as $Inspeccion) {
-            $Inspeccion["Empresa"] = $Empresa->firstWhere('ID', $Inspeccion['IDEmpresa']);
-            unset($Inspeccion['IDEmpresa']);
+            $Empresa = $Empresas->firstWhere('ID', $Inspeccion['IDEmpresa']);
+            $Empresa["IDExterno"] = $Empresa["ID"];
+            unset($Empresa["ID"]);
+            $Inspeccion["Empresa"] = $Empresa;
+//            unset($Inspeccion['IDEmpresa']);
         }
 
         return response()->json($Inspeccions, 200);

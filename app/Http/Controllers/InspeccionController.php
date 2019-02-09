@@ -93,11 +93,11 @@ class InspeccionController extends Controller
 //        whereYear('created_at', '2016')
 
 //      Validación
-        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
-            return response()->json([
-                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
-            ], 409);
-        }
+//        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
+//            return response()->json([
+//                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
+//            ], 409);
+//        }
 
         if (!Formulario::join('Clasificacion', 'Clasificacion.IDFormulario', 'Formulario.ID')
             ->join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')
@@ -242,39 +242,41 @@ class InspeccionController extends Controller
 
     private function uploadFirebase(Inspeccion $Inspeccion)
     {
-        // Comprobar Internet
-        if (Utilidad::Online()) {
-            $DataFirebase = null;
-            if ($Inspeccion->IDColaborador) {
-                $DataFirebase = [
-                    'ID' => $Inspeccion->ID,
-                    'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
-                    'IDFormulario' => $Inspeccion->IDFormulario,
-                    'IDColaborador' => $Inspeccion->IDColaborador,
-                    'Estado' => $Inspeccion->Estado,
-                    'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
-                        ->first([
-                            'ID',
-                            'RUC',
-                            'RazonSocial',
-                            'NombreComercial',
-                            'TipoContribuyente',
-                            'Direccion',
-                            'Referencia',
-                            'Telefono',
-                            'Celular',
-                            'Email',
-                            'Latitud',
-                            'Longitud'
-                        ])->toArray()
-                ];
+        if (!$Inspeccion->InspWeb)
+            // Comprobar Internet
+            if (Utilidad::Online()) {
+                $DataFirebase = null;
+                if ($Inspeccion->IDColaborador) {
+                    $DataFirebase = [
+                        'ID' => $Inspeccion->ID,
+                        'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
+                        'IDFormulario' => $Inspeccion->IDFormulario,
+                        'IDColaborador' => $Inspeccion->IDColaborador,
+                        'Estado' => $Inspeccion->Estado,
+                        'IDEmpresa' => $Inspeccion->IDEmpresa,
+                        'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
+                            ->first([
+                                'ID as IDExterno',
+                                'RUC',
+                                'RazonSocial',
+                                'NombreComercial',
+                                'TipoContribuyente',
+                                'Direccion',
+                                'Referencia',
+                                'Telefono',
+                                'Celular',
+                                'Email',
+                                'Latitud',
+                                'Longitud'
+                            ])->toArray()
+                    ];
 
-                $document = $this->firestore->collection('inspeccion')->document('insp_' . $Inspeccion->ID);
-                $document->set($DataFirebase);
-                $Inspeccion->firebase_at = Carbon::now();
-                $Inspeccion->save();
+                    $document = $this->firestore->collection('inspeccion')->document('insp_' . $Inspeccion->ID);
+                    $document->set($DataFirebase);
+                    $Inspeccion->firebase_at = Carbon::now();
+                    $Inspeccion->save();
+                }
             }
-        }
     }
 
     #region "Sync Firebase - Device"
@@ -286,7 +288,7 @@ class InspeccionController extends Controller
         $Inspeccion->MedioUpdate = 'DEV';
         $Inspeccion->save();
 
-        if ($Inspeccion->Estado == 'REI')
+        if ($Inspeccion->FechaPlazo)
             $this->InsertReinspeccion($Inspeccion);
 
         $rows = $request->input('result');
@@ -352,10 +354,14 @@ class InspeccionController extends Controller
     {
         Observacion::where('IDInspeccion', $Inspeccion->ID)->delete();
         $rows = [];
-        foreach ($Observacions as $observacion) {
-            $rows[] = ["Observacion" => $observacion];
+        if ($Observacions) {
+            foreach ($Observacions as $observacion) {
+                $rows[] = ["Observacion" => $observacion];
+            }
+            if (count($rows) > 0)
+                $Inspeccion->observacions()->createMany($rows);
         }
-        $Inspeccion->observacions()->createMany($rows);
+
     }
 
     #endregion
@@ -463,10 +469,13 @@ class InspeccionController extends Controller
     {
         $InspeccionNew = new Inspeccion();
         $InspeccionNew->IDRef = $Inspeccion->ID;
+        $InspeccionNew->FechaTentativa = $Inspeccion->FechaTentativa;
+        $InspeccionNew->UsuarioRegistro = $Inspeccion->UsuarioRegistro;
         $InspeccionNew->Estado = 'PEN';
         $InspeccionNew->IDEmpresa = $Inspeccion->IDEmpresa;
         $InspeccionNew->IDColaborador = $Inspeccion->IDColaborador;
         $InspeccionNew->IDFormulario = $Inspeccion->IDFormulario;
+        $InspeccionNew->InspWeb = $Inspeccion->InspWeb;
         $InspeccionNew->save();
         $this->uploadFirebase($InspeccionNew);
     }

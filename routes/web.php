@@ -279,7 +279,7 @@ $router->group(['middleware' => ['device']], function () use ($router) {
 
 
     // SyncInspeccion - Recibir información del Dispositivo
-    $router->put('device/inspeccion/{id}/', ['uses' => 'InspeccionController@syncInspeccionDevice']);
+    $router->put('device/inspeccion/{id}', ['uses' => 'InspeccionController@syncInspeccionDevice']);
 
 });
 

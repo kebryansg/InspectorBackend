@@ -32,7 +32,8 @@ class Rcomponente extends Eloquent
 	protected $casts = [
 		'Cumple' => 'int',
 		'IDRSeccion' => 'int',
-		'IDTipoComp' => 'int'
+		'IDTipoComp' => 'int',
+		'Result' => 'array',
 	];
 
 	protected $fillable = [

@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Longitud
  * @property int $UsuarioRegistro
  * @property int $UsuarioUpdate
+ * @property int $InspWeb
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $firebase_at
@@ -50,7 +51,8 @@ class Inspeccion extends Eloquent
         'IDColaborador' => 'int',
         'IDRef' => 'int',
         'UsuarioRegistro' => 'int',
-        'UsuarioUpdate' => 'int'
+        'UsuarioUpdate' => 'int',
+        'InspWeb' => 'boolean',
     ];
 
     protected $dates = [
@@ -77,6 +79,7 @@ class Inspeccion extends Eloquent
         'MedioUpdate',
         'Latitud',
         'Longitud',
+        'InspWeb',
     ];
 
     public function empresa()
