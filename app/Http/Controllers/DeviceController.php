@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $Devices = Device::paginate($request->input('psize'));
         return response($Devices, 201);
     }
@@ -46,7 +47,8 @@ class DeviceController extends Controller
 
     }
 
-    public function aprobarDevice(Request $request, $id ){
+    public function aprobarDevice(Request $request, $id)
+    {
         $Device = Device::find($id);
         $Device->Autorizado = $request->input('permiso');
         $Device->save();
@@ -74,7 +76,8 @@ class DeviceController extends Controller
         return response()->json($rows, 200);
     }
 
-    public function SyncInspeccion(Request $request){
+    public function SyncInspeccion(Request $request)
+    {
         $Inspeccions = \App\Models\Inspeccion::whereNotNull('IDColaborador')->where('Estado', 'PEN')->where('InspWeb', 0)
             ->get([
                 'Inspeccion.ID',
@@ -91,13 +94,13 @@ class DeviceController extends Controller
             $Empresa["IDExterno"] = $Empresa["ID"];
             unset($Empresa["ID"]);
             $Inspeccion["Empresa"] = $Empresa;
-//            unset($Inspeccion['IDEmpresa']);
         }
 
         return response()->json($Inspeccions, 200);
     }
 
-    public function SyncFormulario(Request $request){
+    public function SyncFormulario(Request $request)
+    {
         $query = \App\Models\Formulario::with(
             ['seccions.componentes' => function ($query) {
                 return $query->where('Estado', 'ACT');
@@ -119,7 +122,8 @@ class DeviceController extends Controller
         return response()->json($Formularios, 200);
     }
 
-    public function SyncActEconomica(){
+    public function SyncActEconomica()
+    {
         $Acteconomica = \App\Models\Acteconomica::with(
             ['tipoacteconomicas.clasificacions' => function ($query) {
                 return $query->whereNotNull('IDFormulario');
