@@ -328,4 +328,5 @@ $router->post('firebase/', function () use ($firestore) {
 });
 
 $router->get('solicitud_pdf/{id}', ["uses" => "InspeccionController@generateSolicitudPDF"]);
+//$router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF']);
 $router->get('inspeccion_pendupload', ["uses" => "InspeccionController@getInspeccionSync"]);

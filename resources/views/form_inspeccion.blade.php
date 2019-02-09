@@ -12,6 +12,12 @@
     <body>
 
     @php
+        $Estados = [
+            "S" => "Si",
+            "N" => "No",
+            "A" => "No Aplica"
+        ];
+
         $Institucion = \App\Models\Institucion::first();
 
     @endphp
@@ -48,26 +54,30 @@
                     <span class="title-main">Información Básica</span>
                     <table >
                         <tbody>
-                        <tr>
-                            <td class="text-bold">Fecha Inspección</td>
-                            <td>{{ $Inspeccion->FechaInspeccion  }}</td>
+                            <tr>
+                                <td class="text-bold">Fecha Inspección</td>
+                                <td>{{ $Inspeccion->FechaInspeccion  }}</td>
 
-                            <td class="text-bold">Estado</td>
-                            <td>{{ $Inspeccion->getEstado()  }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-bold">Fecha Registro</td>
-                            <td>{{ $Inspeccion->created_at  }}</td>
+                                <td class="text-bold">Estado</td>
+                                <td>{{ $Inspeccion->getEstado()  }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-bold">Fecha Registro</td>
+                                <td>{{ $Inspeccion->created_at  }}</td>
 
-                            <td class="text-bold">Formulario</td>
-                            <td>{{ $Inspeccion->formulario->Descripcion  }}</td>
-                        </tr>
-                        <tr>
+                                <td class="text-bold">Formulario</td>
+                                <td>{{ $Inspeccion->formulario->Descripcion  }}</td>
+                            </tr>
+                            <tr>
 
-                            <td class="text-bold">Colaborador</td>
-                            <td colspan="3">{{ $Inspeccion->colaborador->ApellidoPaterno . ' ' . $Inspeccion->colaborador->ApellidoMaterno . ' ' . $Inspeccion->colaborador->NombrePrimero  }}</td>
+                                <td class="text-bold">Colaborador</td>
+                                <td colspan="3">{{ $Inspeccion->colaborador->ApellidoPaterno . ' ' . $Inspeccion->colaborador->ApellidoMaterno . ' ' . $Inspeccion->colaborador->NombrePrimero  }}</td>
 
-                        </tr>
+                            </tr>
+                            <tr>
+                                <td class="text-bold">Fecha Plazo</td>
+                                <td colspan="3">{{ $Inspeccion->FechaPlazo }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -124,16 +134,97 @@
                             </thead>
                             <tbody>
                             @foreach ($seccion["rcomponentes"] as $componentes)
-                                <tr>
-                                    <td>{{ $componentes["Descripcion"] }}</td>
+                                    @switch($componentes["IDTipoComp"])
+                                        @case('4'):
+                                            <tr>
+                                                <td class="text-bold">{{ $componentes["Descripcion"] }}</td>
+                                                <td>{{ $componentes["Result"]? 'Si':'No'  }}</td>
+                                            </tr>
+                                        @break;
+                                        @case('6'):
+                                            <tr>
+                                                <td colspan="2" class="text-bold">{{ $componentes["Descripcion"] }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tbody>
+                                                            @foreach($componentes["Result"]["Atributo"] as $Atributo)
+                                                                <tr>
+                                                                    <td class="text-bold">{{ $Atributo["display"]  }}</td>
+                                                                    <td>{{ $Atributo["value"]  }}</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td>
+                                                    <table>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td class="text-bold">Cumple</td>
+                                                            <td>{{ $Estados[$componentes["Result"]["Cumple"]] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-bold">Operativos</td>
+                                                            <td>{{ $componentes["Result"]["Operativos"] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-bold">No Operativos</td>
+                                                            <td>{{ $componentes["Result"]["NoOperativos"] }}</td>
+                                                        </tr>
 
-                                    @if($componentes["IDTipoComp"] == '4')
-                                        <td>{{ $componentes["Result"]? 'Si':'No'  }}</td>
-                                    @else
-                                        <td>{{ $componentes["Result"]  }}</td>
-                                    @endif
+                                                        @if($componentes["Result"]["Cumple"] == 'N')
+                                                            <tr>
+                                                                <td class="text-bold">Disposición</td>
+                                                                <td>{{ $componentes["Result"]["Disposicion"] }}</td>
+                                                            </tr>
+                                                        @endif
 
-                                </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        @break;
+                                        @case('5'):
+                                            <tr>
+                                                <td class="text-bold">{{ $componentes["Descripcion"] }}</td>
+                                                <td>
+                                                    <table>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td class="text-bold">Cantidad</td>
+                                                            <td>{{ $componentes["Result"]["Cantidad"] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-bold">Cumple</td>
+                                                            <td>{{ $Estados[$componentes["Result"]["Cumple"]] }}</td>
+                                                        </tr>
+
+                                                        @if($componentes["Result"]["Cumple"] == 'N')
+                                                            <tr>
+                                                                <td class="text-bold">Adquirir</td>
+                                                                <td>{{ $componentes["Result"]["Adquirir"] }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-bold">Disposición</td>
+                                                                <td>{{ $componentes["Result"]["Dispocision"] }}</td>
+                                                            </tr>
+                                                        @endif
+
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        @break;
+                                        @default:
+                                            <tr>
+                                                <td class="text-bold">{{ $componentes["Descripcion"] }}</td>
+                                                <td>{{ $componentes["Result"]  }}</td>
+                                            </tr>
+                                        @break;
+                                    @endswitch
+
                             @endforeach
                             </tbody>
                         </table>
@@ -148,7 +239,7 @@
 
                     @if(count($Inspeccion->observacions) > 0)
 
-                        <span class="title-main">Observaciones</span>
+                        <span class="title-main">Disposición</span>
                         <ul>
                             @foreach ($Inspeccion->observacions as $observacion)
                                 <li>{{ $observacion->Observacion  }}</li>

@@ -47,8 +47,18 @@ class InspeccionController extends Controller
      */
     public function index(Request $request)
     {
-        $Inspeccion = Inspeccion::with('empresa', 'colaborador')
-            ->paginate($request->input('psize'));
+        $Other = json_decode($request->input('other'), true);
+        $query = Inspeccion::with('empresa', 'colaborador');
+
+        if ($Other["Estado"] !== '*')
+            if ($Other["Estado"] == 'REI')
+                $query->where('Estado', 'REP')->whereNotNull('FechaPlazo');
+            else
+                $query->where('Estado', $Other["Estado"]);
+        if($Other["Desde"] !== '*')
+            $query->whereBetween('created_at',[$Other["Desde"]." 00:00:00",$Other["Hasta"]." 23:59:59"]);
+
+        $Inspeccion = $query->paginate($request->input('psize'));
         return response()->json($Inspeccion, 200);
     }
 
