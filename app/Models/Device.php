@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * Class Device
  * 
  * @property int $ID
+ * @property string $Nombre
  * @property string $MAC
  * @property string $Token
  * @property string $TokenFCM
@@ -31,8 +32,13 @@ class Device extends Eloquent
 
 	protected $fillable = [
 		'MAC',
+		'Nombre',
 		'Token',
 		'TokenFCM',
 		'Autorizado'
 	];
+
+	protected $hidden = [
+        'MAC',
+    ];
 }

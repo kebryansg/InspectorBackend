@@ -2,6 +2,7 @@
 
 date_default_timezone_set('America/Guayaquil');
 
+use Illuminate\Support\Facades\DB;
 use Morrislaptop\Firestore\Factory;
 use Kreait\Firebase\ServiceAccount;
 
@@ -15,13 +16,6 @@ $router->get('/', function () use ($router) {
     return response()->json($router->app->version(), 200);
 });
 
-$router->get('/update_user', function (\Illuminate\Http\Request $request) {
-    \App\Models\User::where('ID', 1)->update([
-        "email" => "admin@admin.com",
-        "password" => password_hash('admin12345', PASSWORD_BCRYPT)
-    ]);
-    return 1;
-});
 
 $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
@@ -239,6 +233,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Device
     $router->get('device', ["uses" => "DeviceController@index"]);
     $router->get('device/{id}', ['uses' => 'DeviceController@show']);
+    $router->put('device_nombre/{id}', ['uses' => 'DeviceController@asignarNombre']);
     $router->put('device/{id}', ['uses' => 'DeviceController@aprobarDevice']);
     #endregion
 

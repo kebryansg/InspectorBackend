@@ -264,6 +264,7 @@ class InspeccionController extends Controller
                         'IDColaborador' => $Inspeccion->IDColaborador,
                         'Estado' => $Inspeccion->Estado,
                         'IDEmpresa' => $Inspeccion->IDEmpresa,
+                        'UlTimaReinsp' => DB::selectOne("Select ultima_reinps(?) as UlTimaReinsp", [ $Inspeccion->IDRef ])->UlTimaReinsp,
                         'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
                             ->first([
                                 'ID as IDExterno',

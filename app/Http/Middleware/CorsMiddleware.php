@@ -14,12 +14,20 @@ class CorsMiddleware
      */
     public function handle($request, Closure $next)
     {
+
+        $origin = $request->header('origin');
+        $AllowHeader = '*';
+        $AllowMethods = '*';
+        if($origin == 'http://localhost'){
+            $AllowHeader = 'Content-Type, Accept, Authorization, X-Requested-With, Application';
+            $AllowMethods = 'GET, PUT, POST, DELETE, HEAD';
+        }
+
         $headers = [
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods' => '*',
+            'Access-Control-Allow-Origin' => $origin,
+            'Access-Control-Allow-Methods' => $AllowMethods,
             'Access-Control-Allow-Credentials' => 'true',
-            'Access-Control-Max-Age' => '86400',
-            'Access-Control-Allow-Headers' => '*',
+            'Access-Control-Allow-Headers' => $AllowHeader,
         ];
 
         if ($request->isMethod('OPTIONS')) {
@@ -28,9 +36,10 @@ class CorsMiddleware
 
         $response = $next($request);
 
-        $response->headers->set('Access-Control-Allow-Origin' , '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Application');
+        $response->headers->set('Access-Control-Allow-Origin' , $origin);
+        $response->headers->set('Access-Control-Allow-Methods', $AllowMethods);
+        $response->headers->set('Access-Control-Allow-Headers', $AllowHeader);
+
 
         return $response;
 
