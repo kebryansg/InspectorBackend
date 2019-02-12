@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Tue, 12 Feb 2019 17:19:30 +0000.
  */
 
 namespace App\Models;
@@ -10,7 +10,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
- * Class Tipoempresa
+ * Class Categorium
  * 
  * @property int $ID
  * @property string $Nombre
@@ -18,12 +18,12 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Estado
  * 
  * @property \Illuminate\Database\Eloquent\Collection $empresas
+ * @property \App\Models\Grupocategorium $grupocategorium
  *
  * @package App\Models
  */
-class Tipoempresa extends Eloquent
+class Categorium extends Eloquent
 {
-	protected $table = 'tipoempresa';
 	protected $primaryKey = 'ID';
 	public $incrementing = false;
 	public $timestamps = false;
@@ -40,6 +40,11 @@ class Tipoempresa extends Eloquent
 
 	public function empresas()
 	{
-		return $this->hasMany(\App\Models\Empresa::class, 'IDTipoEmpresa');
+		return $this->hasMany(\App\Models\Empresa::class, 'IDTarifaCategoria');
+	}
+
+	public function grupocategorium()
+	{
+		return $this->hasOne(\App\Models\Grupocategorium::class, 'IDCategoria');
 	}
 }

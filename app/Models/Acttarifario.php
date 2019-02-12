@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 03 Nov 2018 19:01:02 +0000.
+ * Date: Tue, 12 Feb 2019 17:19:30 +0000.
  */
 
 namespace App\Models;
@@ -10,36 +10,45 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
- * Class Tipoempresa
+ * Class Acttarifario
  * 
  * @property int $ID
+ * @property int $IDGrupo
  * @property string $Nombre
  * @property string $Descripcion
  * @property string $Estado
  * 
+ * @property \App\Models\Grupo $grupo
  * @property \Illuminate\Database\Eloquent\Collection $empresas
  *
  * @package App\Models
  */
-class Tipoempresa extends Eloquent
+class Acttarifario extends Eloquent
 {
-	protected $table = 'tipoempresa';
+	protected $table = 'acttarifario';
 	protected $primaryKey = 'ID';
 	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'ID' => 'int'
+		'ID' => 'int',
+		'IDGrupo' => 'int'
 	];
 
 	protected $fillable = [
+		'IDGrupo',
 		'Nombre',
 		'Descripcion',
 		'Estado'
 	];
 
+	public function grupo()
+	{
+		return $this->belongsTo(\App\Models\Grupo::class, 'IDGrupo');
+	}
+
 	public function empresas()
 	{
-		return $this->hasMany(\App\Models\Empresa::class, 'IDTipoEmpresa');
+		return $this->hasMany(\App\Models\Empresa::class, 'IDTarifaActividad');
 	}
 }

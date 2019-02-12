@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Acteconomica;
+use App\Models\Tipoempresa;
 use Illuminate\Http\Request;
 
-class ActividadEconomicaController extends Controller
+class TipoEmpresaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class ActividadEconomicaController extends Controller
      */
     public function index(Request $request)
     {
-        $Acteconomica = Acteconomica::where('Estado', 'ACT')->orderBy('Descripcion')->paginate($request->input('psize'));
-        return response($Acteconomica, 201);
+        $Tipoempresa = Tipoempresa::where('Estado', 'ACT')->orderBy('Nombre')->paginate($request->input('psize'));
+        return response($Tipoempresa, 201);
     }
 
     #region CRUD
@@ -27,8 +27,8 @@ class ActividadEconomicaController extends Controller
      */
     public function combo(Request $request)
     {
-        $Acteconomica = Acteconomica::where('Estado', 'ACT')->orderBy('Descripcion')->get();
-        return response($Acteconomica, 201);
+        $Tipoempresa = Tipoempresa::where('Estado', 'ACT')->orderBy('Nombre')->get();
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -49,10 +49,10 @@ class ActividadEconomicaController extends Controller
      */
     public function store(Request $request)
     {
-        $Acteconomica = new Acteconomica();
-        $Acteconomica->fill($request->all());
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
+        $Tipoempresa = new Tipoempresa();
+        $Tipoempresa->fill($request->all());
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -63,8 +63,8 @@ class ActividadEconomicaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        return response($Acteconomica, 201);
+        $Tipoempresa = Tipoempresa::find($id);
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -87,10 +87,10 @@ class ActividadEconomicaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        $Acteconomica->fill($request->all());
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
+        $Tipoempresa = Tipoempresa::find($id);
+        $Tipoempresa->fill($request->all());
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 
     /**
@@ -101,27 +101,10 @@ class ActividadEconomicaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        $Acteconomica->Estado = 'INA';
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
+        $Tipoempresa = Tipoempresa::find($id);
+        $Tipoempresa->Estado = 'INA';
+        $Tipoempresa->save();
+        return response($Tipoempresa, 201);
     }
 
-    #endregion
-
-    public function updateFirebase(Request $request)
-    {
-        $rows = Acteconomica::with(
-            ['tipoacteconomicas.clasificacions' => function ($query) {
-                return $query->whereNotNull('IDFormulario');
-            }])
-            ->has('tipoacteconomicas.clasificacions')
-            ->get()
-            ->toArray();
-        $path = 'ActEconomica/data.json';
-        (new Utilidad())->uploadFile($rows, $path);
-        return response()->json([
-            "status" => true
-        ], 201);
-    }
 }

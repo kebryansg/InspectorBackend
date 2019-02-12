@@ -15,7 +15,7 @@ class EntidadController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Entidad::where('Estado', 'ACT');
+        $query = Entidad::where('Estado', 'ACT')->orderBy('Apellidos')->orderBy('Nombres');
 
         if ($request->input('search'))
             $query->where(function ($query) use ($request) {

@@ -105,12 +105,45 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #endregion
 
     #region ActividadEconómica
+
+    $router->get('acteconomica', ["uses" => "ActividadEconomicaController@index"]);
+    $router->get('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@show']);
+    $router->get('sync_acteconomica/', ['uses' => 'ActividadEconomicaController@updateFirebase']);
+    $router->post('acteconomica', ['uses' => 'ActividadEconomicaController@store']);
+    $router->put('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@update']);
+    $router->delete('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@destroy']);
+    $router->get('acteconomica_combo', ["uses" => "ActividadEconomicaController@combo"]);
+
+    $router->get('tipoempresa', ["uses" => "TipoEmpresaController@index"]);
+    $router->get('tipoempresa_combo', ["uses" => "TipoEmpresaController@combo"]);
+    $router->get('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@show']);
+    $router->post('tipoempresa', ['uses' => 'TipoEmpresaController@store']);
+    $router->put('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@update']);
+    $router->delete('tipoempresa/{id}', ['uses' => 'TipoEmpresaController@destroy']);
+
+    $router->get('categoria', ["uses" => "CategoriaController@index"]);
+    $router->get('categoria_combo', ["uses" => "CategoriaController@combo"]);
+    $router->get('categoria/{id}', ['uses' => 'CategoriaController@show']);
+    $router->post('categoria', ['uses' => 'CategoriaController@store']);
+    $router->put('categoria/{id}', ['uses' => 'CategoriaController@update']);
+    $router->delete('categoria/{id}', ['uses' => 'CategoriaController@destroy']);
+    
+    
+    $router->get('grupo', ["uses" => "GrupoController@index"]);
+    $router->get('grupo_combo', ["uses" => "GrupoController@combo"]);
+    $router->get('grupo/{id}', ['uses' => 'GrupoController@show']);
+    $router->post('grupo', ['uses' => 'GrupoController@store']);
+    $router->put('grupo/{id}', ['uses' => 'GrupoController@update']);
+    $router->delete('grupo/{id}', ['uses' => 'GrupoController@destroy']);
+
+
     $router->get('tipoact', ["uses" => "TipoActEconomicaController@index"]);
     $router->get('tipoact_combo', ["uses" => "TipoActEconomicaController@combo"]);
     $router->get('tipoact/{id}', ['uses' => 'TipoActEconomicaController@show']);
     $router->post('tipoact', ['uses' => 'TipoActEconomicaController@store']);
     $router->put('tipoact/{id}', ['uses' => 'TipoActEconomicaController@update']);
     $router->delete('tipoact/{id}', ['uses' => 'TipoActEconomicaController@destroy']);
+
 
     $router->get('clasificacion', ["uses" => "ClasificacionController@index"]);
     $router->get('clasificacion_combo', ["uses" => "ClasificacionController@combo"]);
@@ -121,13 +154,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->put('clasificacion/{id}', ['uses' => 'ClasificacionController@update']);
     $router->delete('clasificacion/{id}', ['uses' => 'ClasificacionController@destroy']);
 
-    $router->get('acteconomica', ["uses" => "ActividadEconomicaController@index"]);
-    $router->get('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@show']);
-    $router->get('sync_acteconomica/', ['uses' => 'ActividadEconomicaController@updateFirebase']);
-    $router->post('acteconomica', ['uses' => 'ActividadEconomicaController@store']);
-    $router->put('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@update']);
-    $router->delete('acteconomica/{id}', ['uses' => 'ActividadEconomicaController@destroy']);
-    $router->get('acteconomica_combo', ["uses" => "ActividadEconomicaController@combo"]);
+
     #endregion
 
     #region Localization

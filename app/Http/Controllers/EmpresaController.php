@@ -14,7 +14,7 @@ class EmpresaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Empresa::with('clasificacion.tipoacteconomica', 'sector')
+        $query = Empresa::with('sector')
             ->where('Estado', 'ACT');
 
         if($request->input('modal'))
@@ -73,7 +73,7 @@ class EmpresaController extends Controller
 //            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
 
 
-        $Empresa = Empresa::with('clasificacion.tipoacteconomica.acteconomica', 'entidad', 'sector.parroquium.canton')->find($id);
+        $Empresa = Empresa::with('entidad', 'acteconomica', 'tipoempresa', 'sector.parroquium.canton')->find($id);
 
         return response($Empresa, 201);
     }

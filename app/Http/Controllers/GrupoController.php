@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Acteconomica;
+use App\Models\Grupo;
 use Illuminate\Http\Request;
 
-class ActividadEconomicaController extends Controller
+class GrupoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class ActividadEconomicaController extends Controller
      */
     public function index(Request $request)
     {
-        $Acteconomica = Acteconomica::where('Estado', 'ACT')->orderBy('Descripcion')->paginate($request->input('psize'));
-        return response($Acteconomica, 201);
+        $Grupo = Grupo::where('Estado', 'ACT')->paginate($request->input('psize'));
+        return response($Grupo, 201);
     }
 
     #region CRUD
@@ -27,8 +27,13 @@ class ActividadEconomicaController extends Controller
      */
     public function combo(Request $request)
     {
-        $Acteconomica = Acteconomica::where('Estado', 'ACT')->orderBy('Descripcion')->get();
-        return response($Acteconomica, 201);
+        $Grupo = Grupo::with([
+            'acttarifarios' => function ($query) {
+                $query->orderBy('Nombre');
+            },
+            'grupocategorium'
+        ])->where('Estado', 'ACT')->orderBy('Nombre')->get();
+        return response($Grupo, 201);
     }
 
     /**
@@ -49,10 +54,10 @@ class ActividadEconomicaController extends Controller
      */
     public function store(Request $request)
     {
-        $Acteconomica = new Acteconomica();
-        $Acteconomica->fill($request->all());
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
+        $Grupo = new Grupo();
+        $Grupo->fill($request->all());
+        $Grupo->save();
+        return response($Grupo, 201);
     }
 
     /**
@@ -63,8 +68,8 @@ class ActividadEconomicaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        return response($Acteconomica, 201);
+        $Grupo = Grupo::find($id);
+        return response($Grupo, 201);
     }
 
     /**
@@ -87,10 +92,10 @@ class ActividadEconomicaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        $Acteconomica->fill($request->all());
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
+        $Grupo = Grupo::find($id);
+        $Grupo->fill($request->all());
+        $Grupo->save();
+        return response($Grupo, 201);
     }
 
     /**
@@ -101,27 +106,9 @@ class ActividadEconomicaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $Acteconomica = Acteconomica::find($id);
-        $Acteconomica->Estado = 'INA';
-        $Acteconomica->save();
-        return response($Acteconomica, 201);
-    }
-
-    #endregion
-
-    public function updateFirebase(Request $request)
-    {
-        $rows = Acteconomica::with(
-            ['tipoacteconomicas.clasificacions' => function ($query) {
-                return $query->whereNotNull('IDFormulario');
-            }])
-            ->has('tipoacteconomicas.clasificacions')
-            ->get()
-            ->toArray();
-        $path = 'ActEconomica/data.json';
-        (new Utilidad())->uploadFile($rows, $path);
-        return response()->json([
-            "status" => true
-        ], 201);
+        $Grupo = Grupo::find($id);
+        $Grupo->Estado = 'INA';
+        $Grupo->save();
+        return response($Grupo, 201);
     }
 }

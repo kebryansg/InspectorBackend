@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 15 Dec 2018 04:36:22 +0000.
+ * Date: Tue, 12 Feb 2019 17:19:30 +0000.
  */
 
 namespace App\Models;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property string $Descripcion
  * @property string $Estado
  * 
- * @property \Illuminate\Database\Eloquent\Collection $tipoacteconomicas
+ * @property \Illuminate\Database\Eloquent\Collection $empresas
  *
  * @package App\Models
  */
@@ -31,8 +31,8 @@ class Acteconomica extends Eloquent
 		'Estado'
 	];
 
-	public function tipoacteconomicas()
+	public function empresas()
 	{
-		return $this->hasMany(\App\Models\Tipoacteconomica::class, 'IDActEconomica');
+		return $this->hasMany(\App\Models\Empresa::class, 'IDActEconomica');
 	}
 }
