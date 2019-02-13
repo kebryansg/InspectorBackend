@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property int $ID
  * @property string $Descripcion
  * @property string $Valor
+ * @property string $Format
  * @property string $Estado
  * @property bool $Configuracion
  *
@@ -30,12 +31,14 @@ class Tipocomp extends Eloquent
 
     protected $casts = [
         'Configuracion' => 'bool',
-        'Valor' => 'array'
+        'Valor' => 'array',
+        'Format' => 'array',
     ];
 
     protected $fillable = [
         'Descripcion',
         'Valor',
+        'Format',
         'Estado',
         'Configuracion'
     ];

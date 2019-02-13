@@ -24,12 +24,13 @@ class CorsMiddleware
             'http://localhost:8100'
         ];
 
-        $origin = $request->header('origin');
+        $origin = '*';
         $AllowHeader = '*';
         $AllowMethods = '*';
-        if (in_array($origin, $possibleOrigins) != -1) {
+        if (false) {
+//        if (in_array($request->header('origin'), $possibleOrigins)) {
             $AllowHeader = 'Content-Type, Accept, Authorization, X-Requested-With, Application';
-            $AllowMethods = 'GET, PUT, POST, DELETE, HEAD, OPTIONS';
+            $AllowMethods = 'GET, PUT, POST, DELETE, HEAD';
         }
 
         $headers = [

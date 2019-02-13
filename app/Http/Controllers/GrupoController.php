@@ -68,7 +68,12 @@ class GrupoController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $Grupo = Grupo::find($id);
+        $Grupo = Grupo::with([
+            'acttarifarios' => function ($query) {
+                $query->orderBy('Nombre');
+            },
+            'grupocategorium'
+        ])->find($id);
         return response($Grupo, 201);
     }
 
