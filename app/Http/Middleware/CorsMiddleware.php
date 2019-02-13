@@ -1,26 +1,35 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class CorsMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
 
+        $possibleOrigins = [
+            '*',
+            'http://localhost',
+            'http://localhost:4200',
+            'http://localhost:8100'
+        ];
+
         $origin = $request->header('origin');
         $AllowHeader = '*';
         $AllowMethods = '*';
-        if($origin == 'http://localhost'){
+        if (in_array($origin, $possibleOrigins) != -1) {
             $AllowHeader = 'Content-Type, Accept, Authorization, X-Requested-With, Application';
-            $AllowMethods = 'GET, PUT, POST, DELETE, HEAD';
+            $AllowMethods = 'GET, PUT, POST, DELETE, HEAD, OPTIONS';
         }
 
         $headers = [
@@ -36,7 +45,7 @@ class CorsMiddleware
 
         $response = $next($request);
 
-        $response->headers->set('Access-Control-Allow-Origin' , $origin);
+        $response->headers->set('Access-Control-Allow-Origin', $origin);
         $response->headers->set('Access-Control-Allow-Methods', $AllowMethods);
         $response->headers->set('Access-Control-Allow-Headers', $AllowHeader);
 
