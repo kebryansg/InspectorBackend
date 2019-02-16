@@ -62,18 +62,8 @@ class EmpresaController extends Controller
      */
     public function show(Request $request, $id)
     {
-//        $Empresa = Empresa::join('Clasificacion', 'Clasificacion.ID', 'IDClasificacion')
-//            ->join('TipoActEconomica', 'TipoActEconomica.ID', 'Clasificacion.IDTipoActEcon')
-//            ->join('ActEconomica', 'ActEconomica.ID', 'TipoActEconomica.IDActEconomica')
-//            ->join('Sector', 'Sector.ID', 'IDSector')
-//            ->join('Parroquia', 'Parroquia.ID', 'Sector.IDParroquia')
-//            ->join('Canton', 'Canton.ID', 'IDCanton')
-//            ->join('Provincia', 'Provincia.ID', 'Canton.IDProvincia')
-//            ->where('Empresa.ID', $id)
-//            ->first(['Empresa.*', 'IDTipoActEcon', 'IDActEconomica', 'IDProvincia', 'IDCanton', 'IDParroquia']);
 
-
-        $Empresa = Empresa::with('entidad', 'acteconomica', 'tipoempresa', 'sector.parroquium.canton')->find($id);
+        $Empresa = Empresa::with('entidad', 'sector.parroquium.canton')->find($id);
 
         return response($Empresa, 201);
     }

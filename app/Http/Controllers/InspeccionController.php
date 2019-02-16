@@ -103,17 +103,9 @@ class InspeccionController extends Controller
 //        whereYear('created_at', '2016')
 
 //      Validación
-//        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->exists()) {
-//            return response()->json([
-//                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
-//            ], 409);
-//        }
-
-        if (!Formulario::join('Clasificacion', 'Clasificacion.IDFormulario', 'Formulario.ID')
-            ->join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')
-            ->where('Empresa.ID', $data['IDEmpresa'])->exists()) {
+        if (Inspeccion::where('IDEmpresa', $data['IDEmpresa'])->where('Estado', 'PEN')->whereYear('created_at', Carbon::now()->year)->exists()) {
             return response()->json([
-                'message' => 'No existe un formulario asignado para la Actividad Económica de la Empresa.'
+                'message' => 'Para la Empresa en cuestión ya existe una Inspección pendiente.'
             ], 409);
         }
 
@@ -122,7 +114,7 @@ class InspeccionController extends Controller
             $Inspeccion->fill($request->all());
             $Inspeccion->UsuarioRegistro = $request->user()->id;
             $Inspeccion->Estado = 'PEN';
-            $Inspeccion->IDFormulario = Clasificacion::join('Empresa', 'Empresa.IDClasificacion', 'Clasificacion.ID')->where('Empresa.ID', $Inspeccion->IDEmpresa)->first()->IDFormulario;
+            $Inspeccion->IDFormulario = Parametro::where('Abr', 'FORMD')->first()->Valor;
             $Inspeccion->save();
             DB::commit();
         } catch (\Exception $exception) {
@@ -144,7 +136,7 @@ class InspeccionController extends Controller
     {
         $Inspeccion = Inspeccion::with([
             'empresa' => function ($query) {
-                $query->with('sector', 'clasificacion');
+                $query->with('sector', 'acteconomica');
                 return $query;
             },
             'colaborador',
@@ -318,7 +310,7 @@ class InspeccionController extends Controller
         try {
             // Reinspeccion
             $Inspeccion = Inspeccion::find($id);
-            if ($Inspeccion->Estado == 'REI')
+            if ($Inspeccion->FechaPlazo)
                 $this->InsertReinspeccion($Inspeccion);
 
             Utilidad::CrearDirectorioInspeccion($id);
@@ -392,7 +384,7 @@ class InspeccionController extends Controller
     {
         $Inspeccion = Inspeccion::with([
             'empresa' => function ($query) {
-                $query->with('sector', 'clasificacion');
+                $query->with('sector', 'acteconomica');
                 return $query;
             },
             'colaborador',
@@ -415,7 +407,7 @@ class InspeccionController extends Controller
     {
         $Inspeccion = Inspeccion::with([
             'empresa' => function ($query) {
-                $query->with('sector.parroquium', 'clasificacion.tipoacteconomica.acteconomica', 'entidad');
+                $query->with('sector.parroquium', 'acteconomica', 'entidad');
                 return $query;
             },
             'colaborador',
@@ -479,7 +471,7 @@ class InspeccionController extends Controller
     public function InsertReinspeccion(Inspeccion $Inspeccion)
     {
         $InspeccionNew = new Inspeccion();
-        $InspeccionNew->IDRef = $Inspeccion->ID;
+        $InspeccionNew->IDRef = ($Inspeccion->IDRef)? $Inspeccion->IDRef: $Inspeccion->ID;
         $InspeccionNew->FechaTentativa = $Inspeccion->FechaTentativa;
         $InspeccionNew->UsuarioRegistro = $Inspeccion->UsuarioRegistro;
         $InspeccionNew->Estado = 'PEN';

@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Class Area
- * 
+ *
  * @property int $ID
  * @property string $Descripcion
  * @property string $Estado
  * @property int $IDDepartamento
- * 
+ *
  * @property \App\Models\Departamento $departamento
  * @property \Illuminate\Database\Eloquent\Collection $colaboradors
  *
@@ -24,29 +24,27 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  */
 class Area extends Eloquent
 {
-	protected $table = 'area';
-	protected $primaryKey = 'ID';
-	public $incrementing = false;
-	public $timestamps = false;
+    protected $table = 'area';
+    protected $primaryKey = 'ID';
+    public $timestamps = false;
 
-	protected $casts = [
-		'ID' => 'int',
-		'IDDepartamento' => 'int'
-	];
+    protected $casts = [
+        'IDDepartamento' => 'int'
+    ];
 
-	protected $fillable = [
-		'Descripcion',
-		'Estado',
-		'IDDepartamento'
-	];
+    protected $fillable = [
+        'Descripcion',
+        'Estado',
+        'IDDepartamento'
+    ];
 
-	public function departamento()
-	{
-		return $this->belongsTo(\App\Models\Departamento::class, 'IDDepartamento');
-	}
+    public function departamento()
+    {
+        return $this->belongsTo(\App\Models\Departamento::class, 'IDDepartamento');
+    }
 
-	public function colaboradors()
-	{
-		return $this->hasMany(\App\Models\Colaborador::class, 'IDArea');
-	}
+    public function colaboradors()
+    {
+        return $this->hasMany(\App\Models\Colaborador::class, 'IDArea');
+    }
 }

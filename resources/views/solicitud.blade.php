@@ -111,7 +111,7 @@
                                     <td>Nombre Comercial: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->NombreComercial }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Actividad Económica: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->clasificacion->tipoacteconomica->acteconomica->Descripcion }}</span></td>
+                                    <td>Actividad Económica: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->acteconomica->Descripcion }}</span></td>
                                 </tr>
                                 <tr>
                                     <td>Dirección: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->Direccion }}</span></td>

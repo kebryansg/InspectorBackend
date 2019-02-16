@@ -50,7 +50,8 @@ class DeviceController extends Controller
 
     }
 
-    public function asignarNombre(Request $request, $id){
+    public function asignarNombre(Request $request, $id)
+    {
         $Device = Device::find($id);
         $Device->Nombre = $request->input('Nombre');
         $Device->save();
@@ -134,6 +135,20 @@ class DeviceController extends Controller
             ->has('tipoacteconomicas.clasificacions')
             ->get();
         return response()->json($Acteconomica, 200);
+
+    }
+
+    public function SyncGrupoEconomico()
+    {
+        $GrupoEco = \App\Models\Grupo::with(
+            [
+                'acttarifarios' => function ($query) {
+                    $query->orderBy('Nombre');
+                },
+                'categorium'
+            ]
+        )->has('acttarifarios', 'categorium')->get();
+        return response()->json($GrupoEco, 200);
 
     }
 

@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
 
         Componente::observe(ComponenteObserver::class);
 
-//        DB::listen(function($query) {
+//        DB::listen(function ($query) {
 //            Log::info(
 //                $query->sql,
 //                $query->bindings,
@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
 //            );
 //        });
     }
+
     /**
      * Register any application services.
      *

@@ -19,7 +19,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * 
  * @property \Illuminate\Database\Eloquent\Collection $acttarifarios
  * @property \Illuminate\Database\Eloquent\Collection $empresas
- * @property \App\Models\Categorium $grupocategorium
+ * @property \App\Models\GrupoCategoria $grupocategorium
+ * @property \App\Models\Categorium $categorium
  *
  * @package App\Models
  */
@@ -27,12 +28,7 @@ class Grupo extends Eloquent
 {
 	protected $table = 'grupo';
 	protected $primaryKey = 'ID';
-	public $incrementing = false;
 	public $timestamps = false;
-
-	protected $casts = [
-		'ID' => 'int'
-	];
 
 	protected $fillable = [
 		'Nombre',
@@ -51,6 +47,11 @@ class Grupo extends Eloquent
 	}
 
 	public function grupocategorium()
+	{
+		return $this->hasMany(\App\Models\GrupoCategoria::class, 'IDGrupo');
+	}
+
+	public function categorium()
 	{
 		return $this->hasManyThrough(
 		    'App\Models\Categorium',

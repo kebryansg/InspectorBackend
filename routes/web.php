@@ -125,16 +125,19 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('categoria_combo', ["uses" => "CategoriaController@combo"]);
     $router->get('categoria/{id}', ['uses' => 'CategoriaController@show']);
     $router->post('categoria', ['uses' => 'CategoriaController@store']);
+    $router->post('categoria/{grupo}', ['uses' => 'CategoriaController@storeGrupo']);
     $router->put('categoria/{id}', ['uses' => 'CategoriaController@update']);
     $router->delete('categoria/{id}', ['uses' => 'CategoriaController@destroy']);
-    
-    
+
+
     $router->get('grupo', ["uses" => "GrupoController@index"]);
     $router->get('grupo_combo', ["uses" => "GrupoController@combo"]);
     $router->get('grupo/{id}', ['uses' => 'GrupoController@show']);
     $router->post('grupo', ['uses' => 'GrupoController@store']);
     $router->put('grupo/{id}', ['uses' => 'GrupoController@update']);
     $router->delete('grupo/{id}', ['uses' => 'GrupoController@destroy']);
+
+    $router->post('acttarifario', ['uses' => 'GrupoController@storeActividad']);
 
 
     $router->get('tipoact', ["uses" => "TipoActEconomicaController@index"]);
@@ -297,7 +300,9 @@ $router->group(['middleware' => ['device']], function () use ($router) {
 
     $router->get('form_sync', ["uses" => "DeviceController@SyncFormulario"]);
 
-    $router->get('acteconomica_sync', ["uses" => "DeviceController@SyncActEconomica"]);
+//    $router->get('acteconomica_sync', ["uses" => "DeviceController@SyncActEconomica"]);
+
+    $router->get('grupoeco_sync', ["uses" => "DeviceController@SyncGrupoEconomico"]);
 
 
     // SyncInspeccion - Recibir información del Dispositivo
@@ -309,15 +314,15 @@ $router->group(['middleware' => ['device']], function () use ($router) {
 $router->put('firebase/inspeccion/{id}', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
 
 // Obtener Anexos segun la Inspección
-$router->get('inspeccion/{id}/anexos/', ['uses' => 'InspeccionController@readAnexos']);
+$router->get('inspeccion/{id}/anexos', ['uses' => 'InspeccionController@readAnexos']);
 
 
 /* Pruebas Ionic */
 $router->get('formulario/{form}/seccion/full/', ["uses" => "FormularioController@seccion_formulario_full"]);
 
 /* Pruebas Firebase */
-$router->get('firebase/', function () use ($firestore) {
-    $collection = $firestore->collection('colaborador');
+$router->get('firebase', function () use ($firestore) {
+    $collection = $firestore->collection('inspeccion');
     $rows = [];
     foreach ($collection->documents() as $document) {
         $rows[] = $document->data();
@@ -326,7 +331,7 @@ $router->get('firebase/', function () use ($firestore) {
     return response()->json($rows, 201);
 });
 
-$router->post('firebase/', function () use ($firestore) {
+$router->post('firebase', function () use ($firestore) {
     $colaboradors = \App\Models\Colaborador::where('IDCargo', 2)
         ->get();
 

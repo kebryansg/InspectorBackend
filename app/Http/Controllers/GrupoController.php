@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Acttarifario;
 use App\Models\Grupo;
+use App\Models\GrupoCategoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GrupoController extends Controller
 {
@@ -31,7 +34,7 @@ class GrupoController extends Controller
             'acttarifarios' => function ($query) {
                 $query->orderBy('Nombre');
             },
-            'grupocategorium'
+            'categorium'
         ])->where('Estado', 'ACT')->orderBy('Nombre')->get();
         return response($Grupo, 201);
     }
@@ -57,7 +60,19 @@ class GrupoController extends Controller
         $Grupo = new Grupo();
         $Grupo->fill($request->all());
         $Grupo->save();
-        return response($Grupo, 201);
+        $Grupo->acttarifarios()->createMany($request->input('actividades'));
+        $Grupo->grupocategorium()->createMany($request->input('categoria'));
+
+        return response()->json($Grupo, 201);
+    }
+
+    public function storeActividad(Request $request)
+    {
+        $Acttarifario = new Acttarifario();
+        $Acttarifario->fill($request->all());
+        $Acttarifario->save();
+
+        return response()->json($Acttarifario, 201);
     }
 
     /**
@@ -72,7 +87,7 @@ class GrupoController extends Controller
             'acttarifarios' => function ($query) {
                 $query->orderBy('Nombre');
             },
-            'grupocategorium'
+            'categorium'
         ])->find($id);
         return response($Grupo, 201);
     }
@@ -100,7 +115,17 @@ class GrupoController extends Controller
         $Grupo = Grupo::find($id);
         $Grupo->fill($request->all());
         $Grupo->save();
-        return response($Grupo, 201);
+
+        foreach ($request->input('actividades') as $actividades) {
+            $Grupo->acttarifarios()->updateOrCreate(["ID" => $actividades["ID"]], $actividades);
+        }
+
+        // Eliminar Todos las categorias asignadas al grupo
+        $Grupo->grupocategorium()->delete();
+        $Grupo->grupocategorium()->createMany($request->input('categoria'));
+
+
+        return response()->json($Grupo, 200);
     }
 
     /**

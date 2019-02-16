@@ -27,7 +27,6 @@ class Acttarifario extends Eloquent
 {
 	protected $table = 'acttarifario';
 	protected $primaryKey = 'ID';
-	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [

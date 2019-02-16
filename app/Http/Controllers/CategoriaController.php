@@ -55,6 +55,16 @@ class CategoriaController extends Controller
         return response($Categorium, 201);
     }
 
+
+    public function storeGrupo(Request $request, $grupo)
+    {
+        $Categorium = new Categorium();
+        $Categorium->fill($request->all());
+        $Categorium->save();
+        $Categorium->grupocategorium()->create(["IDGrupo" => $grupo]);
+        return response($Categorium, 201);
+    }
+
     /**
      * Display the specified resource.
      *

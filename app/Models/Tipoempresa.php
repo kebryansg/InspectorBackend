@@ -11,35 +11,30 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Class Tipoempresa
- * 
+ *
  * @property int $ID
  * @property string $Nombre
  * @property string $Descripcion
  * @property string $Estado
- * 
+ *
  * @property \Illuminate\Database\Eloquent\Collection $empresas
  *
  * @package App\Models
  */
 class Tipoempresa extends Eloquent
 {
-	protected $table = 'tipoempresa';
-	protected $primaryKey = 'ID';
-	public $incrementing = false;
-	public $timestamps = false;
+    protected $table = 'tipoempresa';
+    protected $primaryKey = 'ID';
+    public $timestamps = false;
 
-	protected $casts = [
-		'ID' => 'int'
-	];
+    protected $fillable = [
+        'Nombre',
+        'Descripcion',
+        'Estado'
+    ];
 
-	protected $fillable = [
-		'Nombre',
-		'Descripcion',
-		'Estado'
-	];
-
-	public function empresas()
-	{
-		return $this->hasMany(\App\Models\Empresa::class, 'IDTipoEmpresa');
-	}
+    public function empresas()
+    {
+        return $this->hasMany(\App\Models\Empresa::class, 'IDTipoEmpresa');
+    }
 }

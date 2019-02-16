@@ -105,8 +105,8 @@
                         </tr>
                         <tr>
 
-                            <td class="text-bold">Clasificación</td>
-                            <td >{{ $Inspeccion->Empresa->clasificacion->Descripcion }}</td>
+                            <td class="text-bold">Act. Económica</td>
+                            <td >{{ $Inspeccion->Empresa->acteconomica->Descripcion }}</td>
 
                             <td class="text-bold">Teléfono</td>
                             <td >{{ $Inspeccion->Empresa->Telefono }}</td>

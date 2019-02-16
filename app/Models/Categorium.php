@@ -11,40 +11,35 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Class Categorium
- * 
+ *
  * @property int $ID
  * @property string $Nombre
  * @property string $Descripcion
  * @property string $Estado
- * 
+ *
  * @property \Illuminate\Database\Eloquent\Collection $empresas
- * @property \App\Models\Grupocategorium $grupocategorium
+ * @property \App\Models\GrupoCategoria $grupocategorium
  *
  * @package App\Models
  */
 class Categorium extends Eloquent
 {
-	protected $primaryKey = 'ID';
-	public $incrementing = false;
-	public $timestamps = false;
+    protected $primaryKey = 'ID';
+    public $timestamps = false;
 
-	protected $casts = [
-		'ID' => 'int'
-	];
+    protected $fillable = [
+        'Nombre',
+        'Descripcion',
+        'Estado'
+    ];
 
-	protected $fillable = [
-		'Nombre',
-		'Descripcion',
-		'Estado'
-	];
+    public function empresas()
+    {
+        return $this->hasMany(\App\Models\Empresa::class, 'IDTarifaCategoria');
+    }
 
-	public function empresas()
-	{
-		return $this->hasMany(\App\Models\Empresa::class, 'IDTarifaCategoria');
-	}
-
-	public function grupocategorium()
-	{
-		return $this->hasOne(\App\Models\Grupocategorium::class, 'IDCategoria');
-	}
+    public function grupocategorium()
+    {
+        return $this->hasOne(\App\Models\GrupoCategoria::class, 'IDCategoria');
+    }
 }
