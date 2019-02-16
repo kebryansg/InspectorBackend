@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Clasificacion;
+use App\Models\Comentario;
 use App\Models\Empresa;
 use App\Models\Formulario;
 use App\Models\Inspeccion;
@@ -141,7 +142,8 @@ class InspeccionController extends Controller
             },
             'colaborador',
             'formulario',
-            'observacions'
+            'observacions',
+            'comentarios'
         ])
             ->where('ID', $id)
             ->first();
@@ -507,5 +509,14 @@ class InspeccionController extends Controller
             "status" => true,
             "count" => count($Inspecccions)
         ], 200);
+    }
+
+    public function addComentario(Request $request, $id){
+        $Comentario = new Comentario();
+        $Comentario->fill($request->all());
+        $Comentario->IDUsers_created = $request->user()->id;
+        $Comentario->IDInspeccion = $id;
+        $Comentario->save();
+        return response()->json($Comentario, 201);
     }
 }

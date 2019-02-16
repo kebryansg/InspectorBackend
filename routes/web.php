@@ -50,6 +50,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
 
     #region Empresa
     $router->get('empresa', ["uses" => "EmpresaController@index"]);
+    $router->get('empresa_search', ["uses" => "EmpresaController@empresaSearch"]);
     $router->get('empresa/{id}', ['uses' => 'EmpresaController@show']);
     $router->post('empresa', ['uses' => 'EmpresaController@store']);
     $router->put('empresa/{id}', ['uses' => 'EmpresaController@update']);
@@ -204,6 +205,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('inspeccion/{id}/async', ['uses' => 'InspeccionController@upload']);
     $router->get('inspeccion/{id}/result', ['uses' => 'InspeccionController@resultFormulario']);
     $router->post('inspeccion', ['uses' => 'InspeccionController@store']);
+    $router->post('inspeccion/{id}/comentario', ['uses' => 'InspeccionController@addComentario']);
     $router->put('inspeccion/{id}/', ['uses' => 'InspeccionController@update']);
     $router->delete('inspeccion/{id}/', ['uses' => 'InspeccionController@destroy']);
     $router->put('inspeccion/{id}/coladorador/{colaborador}/', ['uses' => 'InspeccionController@inspeccion_colaborador']);

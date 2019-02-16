@@ -60,8 +60,13 @@ class GrupoController extends Controller
         $Grupo = new Grupo();
         $Grupo->fill($request->all());
         $Grupo->save();
-        $Grupo->acttarifarios()->createMany($request->input('actividades'));
-        $Grupo->grupocategorium()->createMany($request->input('categoria'));
+        if ($request->input('actividades')){
+            $Grupo->acttarifarios()->createMany($request->input('actividades'));
+        }
+
+        if ($request->input('categoria')){
+            $Grupo->grupocategorium()->createMany($request->input('categoria'));
+        }
 
         return response()->json($Grupo, 201);
     }

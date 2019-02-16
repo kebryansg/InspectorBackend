@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @property \App\Models\Empresa $Empresa
  * @property \App\Models\Colaborador $colaborador
  * @property \App\Models\Formulario $formulario
+ * @property \Illuminate\Database\Eloquent\Collection $comentarios
  * @property \Illuminate\Database\Eloquent\Collection $observacions
  * @property \Illuminate\Database\Eloquent\Collection $rseccions
  *
@@ -95,6 +96,11 @@ class Inspeccion extends Eloquent
     public function formulario()
     {
         return $this->belongsTo(\App\Models\Formulario::class, 'IDFormulario');
+    }
+
+    public function comentarios()
+    {
+        return $this->hasMany(\App\Models\Comentario::class, 'IDInspeccion');
     }
 
     public function observacions()

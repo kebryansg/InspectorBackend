@@ -14,10 +14,10 @@ class EmpresaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Empresa::with('sector')
+        $query = Empresa::with('sector', 'acteconomica')
             ->where('Estado', 'ACT');
 
-        if($request->input('modal'))
+        if ($request->input('modal'))
             $query->where('EstadoAplicacion', 'P');
 
         if ($request->input('search'))
@@ -107,5 +107,21 @@ class EmpresaController extends Controller
         $Empresa->Estado = 'INA';
         $Empresa->save();
         return response($Empresa, 201);
+    }
+
+
+    public function empresaSearch(Request $request)
+    {
+        $Empresa = [];
+
+        if ($request->input('search'))
+            $Empresa = Empresa::with('sector', 'acteconomica')
+                ->where('EstadoAplicacion', 'P')
+                ->where(function ($query) use ($request) {
+                    $query->where('RUC', 'like', '%' . $request->input('search') . '%');
+                    $query->orWhere('RazonSocial', 'like', '%' . $request->input('search') . '%');
+                    $query->orWhere('NombreComercial', 'like', '%' . $request->input('search') . '%');
+                })->get();
+        return response()->json($Empresa, 200);
     }
 }
