@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorium;
+use App\Models\Grupo;
 use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
@@ -27,6 +28,15 @@ class CategoriaController extends Controller
      */
     public function combo(Request $request)
     {
+        $Categorium = null;
+        if($request->input('grupo')){
+            $idGrupo = $request->input('grupo');
+            $Grupo = Grupo::with('grupocategorium')->where('ID', $idGrupo)->first();
+            $idsCategoria = $Grupo->grupocategorium()->pluck('IDCategoria');
+            $Categorium = Categorium::whereNotIn('ID', $idsCategoria)->get();
+            return response($Categorium, 201);
+        }
+
         $Categorium = Categorium::where('Estado', 'ACT')->get();
         return response($Categorium, 201);
     }
@@ -63,6 +73,12 @@ class CategoriaController extends Controller
         $Categorium->save();
         $Categorium->grupocategorium()->create(["IDGrupo" => $grupo]);
         return response($Categorium, 201);
+    }
+
+    public function asignGrupo(Request $request, $grupo){
+        $Grupo = Grupo::find($grupo);
+        $Grupo->grupocategorium()->createMany( $request->all() );
+        return response($Grupo, 200);
     }
 
     /**

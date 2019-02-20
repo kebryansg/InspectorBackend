@@ -254,6 +254,7 @@ class InspeccionController extends Controller
                     $DataFirebase = [
                         'ID' => $Inspeccion->ID,
                         'FechaTentativa' => $Inspeccion->FechaTentativa->format('Y-m-d'),
+                        'FechaRegistro' => $Inspeccion->created_at->format('Y-m-d'),
                         'IDFormulario' => $Inspeccion->IDFormulario,
                         'IDColaborador' => $Inspeccion->IDColaborador,
                         'Estado' => $Inspeccion->Estado,
@@ -272,7 +273,10 @@ class InspeccionController extends Controller
                                 'Celular',
                                 'Email',
                                 'Latitud',
-                                'Longitud'
+                                'Longitud',
+                                'IDTarifaGrupo',
+                                'IDTarifaActividad',
+                                'IDTarifaCategoria',
                             ])->toArray()
                     ];
 
@@ -299,6 +303,8 @@ class InspeccionController extends Controller
         $rows = $request->input('result');
         $this->saveResult($rows, $id);
         $this->saveObservacions($request->input('Observacions'), $Inspeccion);
+
+        $this->organizarInspeccion($id);
 
         return response()->json([
             "status" => true,
@@ -353,6 +359,11 @@ class InspeccionController extends Controller
             $Seccion->save();
             $Seccion->rcomponentes()->createMany($row['componentes']);
         }
+    }
+
+    public function organizarInspeccion($id){
+        $collection = $this->firestore->collection('inspeccion');
+        $collection->document("insp_$id")->delete();
     }
 
     private function saveObservacions($Observacions, $Inspeccion)

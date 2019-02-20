@@ -361,16 +361,6 @@ class FormularioController extends Controller
                 $this->uploadFirebase($formulario);
                 $data = $formulario->toArray()["seccions"];
                 (new Utilidad())->uploadFile($data,'Formulario/form_' . $formulario["ID"] . '.json');
-
-//                $storage = $this->firebase->getStorage();
-//                $bucket = $storage->getBucket();
-//
-//                $bucket->upload(
-//                    $data,
-//                    [
-//                        'name' => 'Formulario/form_' . $formulario["ID"] . '.json'
-//                    ]
-//                );
             }
 
             return response()->json([

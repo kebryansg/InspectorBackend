@@ -14,6 +14,14 @@ class DeviceController extends Controller
         return response($Devices, 201);
     }
 
+    public function listDevice(){
+        $Devices = Device::all([
+            'MAC',
+            'Nombre'
+        ]);
+        return response()->json($Devices, 200);
+    }
+
     public function store(Request $request)
     {
         $MAC = $request->input('MAC');
@@ -87,9 +95,26 @@ class DeviceController extends Controller
                 'IDEmpresa',
                 'Inspeccion.IDColaborador',
                 'Inspeccion.IDFormulario',
-                'Inspeccion.Estado'
+                'Inspeccion.Estado',
+                'Inspeccion.created_at as FechaRegistro',
             ]);
-        $Empresas = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get();
+        $Empresas = \App\Models\Empresa::whereIn('ID', $Inspeccions->pluck('IDEmpresa'))->get([
+            'ID',
+            'RUC',
+            'RazonSocial',
+            'NombreComercial',
+            'TipoContribuyente',
+            'Direccion',
+            'Referencia',
+            'Telefono',
+            'Celular',
+            'Email',
+            'Latitud',
+            'Longitud',
+            'IDTarifaGrupo',
+            'IDTarifaActividad',
+            'IDTarifaCategoria',
+        ]);
 
         foreach ($Inspeccions as $Inspeccion) {
             $Empresa = $Empresas->firstWhere('ID', $Inspeccion['IDEmpresa']);
@@ -97,7 +122,6 @@ class DeviceController extends Controller
 
             $Inspeccion["Empresa"] = $Empresa;
             unset($Empresa["ID"]);
-
         }
 
         return response()->json($Inspeccions, 200);
@@ -147,7 +171,7 @@ class DeviceController extends Controller
                 },
                 'categorium'
             ]
-        )->has('acttarifarios', 'categorium')->get();
+        )->has('acttarifarios')->has('categorium')->get();
         return response()->json($GrupoEco, 200);
 
     }

@@ -38,7 +38,4 @@ class Device extends Eloquent
 		'Autorizado'
 	];
 
-	protected $hidden = [
-        'MAC',
-    ];
 }

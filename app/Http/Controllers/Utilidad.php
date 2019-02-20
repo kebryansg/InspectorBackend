@@ -12,6 +12,8 @@ use Kreait\Firebase;
 class Utilidad
 {
 
+    private $firestore;
+    private $firebase;
     /**
      * Utilidad constructor.
      */
@@ -25,6 +27,12 @@ class Utilidad
         $this->firebase = (new Firebase\Factory())
             ->withServiceAccount($serviceAccount)
             ->create();
+    }
+    public function getFirestore(){
+        return $this->firestore;
+    }
+    public function getFirebase(){
+        return $this->firebase;
     }
 
     public static function Online()
@@ -73,6 +81,7 @@ class Utilidad
 
         return (string)Image::make($path)->resize(320, 240)->encode('data-url');
     }
+
     public function uploadFile($data, $path){
         $storage = $this->firebase->getStorage();
         $bucket = $storage->getBucket();

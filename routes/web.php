@@ -127,6 +127,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('categoria/{id}', ['uses' => 'CategoriaController@show']);
     $router->post('categoria', ['uses' => 'CategoriaController@store']);
     $router->post('categoria/{grupo}', ['uses' => 'CategoriaController@storeGrupo']);
+    $router->put('asign_grupocategoria/{grupo}', ['uses' => 'CategoriaController@asignGrupo']);
     $router->put('categoria/{id}', ['uses' => 'CategoriaController@update']);
     $router->delete('categoria/{id}', ['uses' => 'CategoriaController@destroy']);
 
@@ -265,6 +266,7 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     #region Device
     $router->get('device', ["uses" => "DeviceController@index"]);
     $router->get('device/{id}', ['uses' => 'DeviceController@show']);
+    $router->get('list_device', ['uses' => 'DeviceController@listDevice']);
     $router->put('device_nombre/{id}', ['uses' => 'DeviceController@asignarNombre']);
     $router->put('device/{id}', ['uses' => 'DeviceController@aprobarDevice']);
     #endregion
@@ -273,18 +275,15 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('dashboard', ["uses" => "InspeccionController@dashboard"]);
     #endregion
 
-    // Menu Items
-//    $router->get('menu_items', function (Illuminate\Http\Request $request) {
-//        $Modulos = \App\Models\Modulo::with('modulos')->whereNull('IDPadre')->get();
-//        return $Modulos;
-//    });
-
+    #region MenuItems
     $router->get('menu_items', ["uses" => "RolController@userRol"]);
 
     $router->get('menu_items/submodulos', function (Illuminate\Http\Request $request) {
         $Modulos = \App\Models\Modulo::whereNotNull('IDPadre')->orderBy('IDPadre')->get();
         return $Modulos;
     });
+    #endregion
+
 
 
 });
@@ -329,8 +328,7 @@ $router->get('firebase', function () use ($firestore) {
     foreach ($collection->documents() as $document) {
         $rows[] = $document->data();
     }
-
-    return response()->json($rows, 201);
+    return response()->json($rows, 200);
 });
 
 $router->post('firebase', function () use ($firestore) {
@@ -359,3 +357,9 @@ $router->post('firebase', function () use ($firestore) {
 $router->get('solicitud_pdf/{id}', ["uses" => "InspeccionController@generateSolicitudPDF"]);
 //$router->get('pdf_view/{id}', ['uses' => 'InspeccionController@viewPDF']);
 $router->get('inspeccion_pendupload', ["uses" => "InspeccionController@getInspeccionSync"]);
+
+
+
+#region Reportes
+$router->get('users_rol', ["uses" => "ReportController@users_rol"]);
+#endregion

@@ -15,17 +15,22 @@ class EntidadController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Entidad::where('Estado', 'ACT')->orderBy('Apellidos')->orderBy('Nombres');
+        $query = Entidad::orderBy('Apellidos')->orderBy('Nombres');
+
+        if ($request->input('showAll') == 'false') {
+            $query->where('Estado', 'ACT');
+        }
 
         if ($request->input('search'))
             $query->where(function ($query) use ($request) {
-                $query->where('Identificacion', 'like', '%' . $request->input('search') . '%');
-                $query->orWhere('Nombres', 'like', '%' . $request->input('search') . '%');
-                $query->orWhere('Apellidos', 'like', '%' . $request->input('search') . '%');
+                $search = $request->input('search');
+                $query->where('Identificacion', 'like', '%' . $search . '%');
+                $query->orWhere('Nombres', 'like', '%' . $search . '%');
+                $query->orWhere('Apellidos', 'like', '%' . $search . '%');
             });
 
         $Entidad = $query->paginate($request->input('psize'));
-        return response($Entidad, 200);
+        return response()->json($Entidad, 200);
     }
 
     /**
@@ -58,13 +63,10 @@ class EntidadController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->isJson()) {
-            $Entidad = new Entidad();
-            $Entidad->fill($request->all());
-            $Entidad->save();
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Entidad = new Entidad();
+        $Entidad->fill($request->all());
+        $Entidad->save();
+        return response()->json($Entidad, 201);
     }
 
     /**
@@ -75,11 +77,8 @@ class EntidadController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Entidad = Entidad::find($id);
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Entidad = Entidad::find($id);
+        return response()->json($Entidad, 201);
     }
 
     /**
@@ -108,13 +107,10 @@ class EntidadController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Entidad = Entidad::find($id);
-            $Entidad->fill($request->all());
-            $Entidad->save();
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Entidad = Entidad::find($id);
+        $Entidad->fill($request->all());
+        $Entidad->save();
+        return response()->json($Entidad, 200);
     }
 
     /**
@@ -125,12 +121,9 @@ class EntidadController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if ($request->isJson()) {
-            $Entidad = Entidad::find($id);
-            $Entidad->Estado = 'INA';
-            $Entidad->save();
-            return response($Entidad, 201);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $Entidad = Entidad::find($id);
+        $Entidad->Estado = 'INA';
+        $Entidad->save();
+        return response()->json($Entidad, 200);
     }
 }
