@@ -56,8 +56,8 @@ class InspeccionController extends Controller
                 $query->where('Estado', 'REP')->whereNotNull('FechaPlazo');
             else
                 $query->where('Estado', $Other["Estado"]);
-        if($Other["Desde"] !== '*')
-            $query->whereBetween('created_at',[$Other["Desde"]." 00:00:00",$Other["Hasta"]." 23:59:59"]);
+        if ($Other["Desde"] !== '*')
+            $query->whereBetween('created_at', [$Other["Desde"] . " 00:00:00", $Other["Hasta"] . " 23:59:59"]);
 
         $Inspeccion = $query->paginate($request->input('psize'));
         return response()->json($Inspeccion, 200);
@@ -259,7 +259,7 @@ class InspeccionController extends Controller
                         'IDColaborador' => $Inspeccion->IDColaborador,
                         'Estado' => $Inspeccion->Estado,
                         'IDEmpresa' => $Inspeccion->IDEmpresa,
-                        'UlTimaReinsp' => DB::selectOne("Select ultima_reinps(?) as UlTimaReinsp", [ $Inspeccion->IDRef ])->UlTimaReinsp,
+                        'UlTimaReinsp' => DB::selectOne("Select ultima_reinps(?) as UlTimaReinsp", [$Inspeccion->IDRef])->UlTimaReinsp,
                         'Empresa' => Empresa::where('ID', $Inspeccion->IDEmpresa)
                             ->first([
                                 'ID as IDExterno',
@@ -350,6 +350,31 @@ class InspeccionController extends Controller
 
     }
 
+    public function filesFirebase(Request $request, $id)
+    {
+        try {
+            $storage = $this->firebase->getStorage();
+            $bucket = $storage->getBucket();
+//            $options = ['prefix' => 'Inspeccion/insp_' . $id . '/'];
+            $options = ['prefix' => 'Formulario/'];
+            foreach ($bucket->objects($options) as $object) {
+                $destination = __DIR__ . ('/Imgs/' . $object->name());
+                $type = substr($object->name(), strrpos($object->name(), '.') + 1);
+
+                $object->downloadToFile($destination);
+
+            }
+            return response()->json([
+                "status" => true,
+            ], 201);
+        } catch (\Exception $exception) {
+            return response()->json([
+                "status" => false,
+                "message" => $exception->getMessage()
+            ], 200);
+        }
+    }
+
     private function saveResult($rows, $id)
     {
         foreach ($rows as $row) {
@@ -361,7 +386,8 @@ class InspeccionController extends Controller
         }
     }
 
-    public function organizarInspeccion($id){
+    public function organizarInspeccion($id)
+    {
         $collection = $this->firestore->collection('inspeccion');
         $collection->document("insp_$id")->delete();
     }
@@ -484,7 +510,7 @@ class InspeccionController extends Controller
     public function InsertReinspeccion(Inspeccion $Inspeccion)
     {
         $InspeccionNew = new Inspeccion();
-        $InspeccionNew->IDRef = ($Inspeccion->IDRef)? $Inspeccion->IDRef: $Inspeccion->ID;
+        $InspeccionNew->IDRef = ($Inspeccion->IDRef) ? $Inspeccion->IDRef : $Inspeccion->ID;
         $InspeccionNew->FechaTentativa = $Inspeccion->FechaTentativa;
         $InspeccionNew->UsuarioRegistro = $Inspeccion->UsuarioRegistro;
         $InspeccionNew->Estado = 'PEN';
@@ -522,7 +548,8 @@ class InspeccionController extends Controller
         ], 200);
     }
 
-    public function addComentario(Request $request, $id){
+    public function addComentario(Request $request, $id)
+    {
         $Comentario = new Comentario();
         $Comentario->fill($request->all());
         $Comentario->IDUsers_created = $request->user()->id;

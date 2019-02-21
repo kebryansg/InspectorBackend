@@ -24,8 +24,10 @@ class ComponenteObserver
     public function creating(Componente $componente)
     {
         $Tipocomp = Tipocomp::find($componente->IDTipoComp);
-        $componente->Atributo = $Tipocomp->Valor;
-        $componente->Result = $Tipocomp->Format;
+        if($componente->IDTipoComp != 1 && $componente->IDTipoComp != 2){
+            $componente->Atributo = $Tipocomp->Valor;
+            $componente->Result = $Tipocomp->Format;
+        }
 
     }
 
@@ -38,8 +40,10 @@ class ComponenteObserver
     public function updating(Componente $componente)
     {
         $Tipocomp = Tipocomp::find($componente->IDTipoComp);
-        $componente->Atributo = $Tipocomp->Valor;
-        $componente->Result = $Tipocomp->Format;
+        if($componente->IDTipoComp != 1 && $componente->IDTipoComp != 2){
+            $componente->Atributo = $Tipocomp->Valor;
+            $componente->Result = $Tipocomp->Format;
+        }
     }
 
 }

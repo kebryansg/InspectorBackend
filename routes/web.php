@@ -313,6 +313,7 @@ $router->group(['middleware' => ['device']], function () use ($router) {
 
 // SyncInspeccion - Inspector Sync
 $router->put('firebase/inspeccion/{id}', ['uses' => 'InspeccionController@syncInspeccionFirebase']);
+//$router->get('firebase/inspeccion/{id}', ['uses' => 'InspeccionController@filesFirebase']);
 
 // Obtener Anexos segun la Inspección
 $router->get('inspeccion/{id}/anexos', ['uses' => 'InspeccionController@readAnexos']);
