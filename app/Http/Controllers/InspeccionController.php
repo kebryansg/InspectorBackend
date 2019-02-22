@@ -306,23 +306,34 @@ class InspeccionController extends Controller
     public function syncInspeccionDevice(Request $request, $id)
     {
         $Inspeccion = Inspeccion::find($id);
-        $Inspeccion->fill($request->all());
-        $Inspeccion->MedioUpdate = 'DEV';
-        $Inspeccion->save();
+        if ($Inspeccion->Estado == 'PEN') {
+            $Inspeccion->fill($request->all());
+            $Inspeccion->MedioUpdate = 'DEV';
+            $Inspeccion->save();
 
-        if ($Inspeccion->FechaPlazo)
-            $this->InsertReinspeccion($Inspeccion);
+            if ($Inspeccion->FechaPlazo)
+                $this->InsertReinspeccion($Inspeccion);
 
-        $rows = $request->input('result');
-        $this->saveResult($rows, $id);
-        $this->saveObservacions($request->input('Observacions'), $Inspeccion);
+            $rows = $request->input('result');
+            $this->saveResult($rows, $id);
+            $this->saveObservacions($request->input('Observacions'), $Inspeccion);
 
-        $this->organizarInspeccion($id);
+            // Cambio de Categoria
+            $CategoriaOld = Empresa::find($Inspeccion->IDEmpresa)->IDTarifaCategoria;
+            if ($CategoriaOld != $request->input('IDTarifaCategoria')) {
+                Empresa::where('ID', $Inspeccion->IDEmpresa)
+                    ->update(['IDTarifaCategoria' => $request->input('IDTarifaCategoria')]);
+            }
 
-        return response()->json([
-            "status" => true,
-            "data" => $Inspeccion
-        ], 201);
+            return response()->json([
+                "status" => true
+            ], 201);
+        } else {
+            return response()->json([
+                "status" => true
+            ], 201);
+        }
+
     }
 
     public function syncInspeccionFirebase(Request $request, $id)
