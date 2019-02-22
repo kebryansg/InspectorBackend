@@ -49,6 +49,7 @@ class InspeccionController extends Controller
     public function index(Request $request)
     {
         $Other = json_decode($request->input('other'), true);
+        $search = $request->input('search');
         $query = Inspeccion::with('empresa', 'colaborador');
 
         if ($Other["Estado"] !== '*')
@@ -56,9 +57,21 @@ class InspeccionController extends Controller
                 $query->where('Estado', 'REP')->whereNotNull('FechaPlazo');
             else
                 $query->where('Estado', $Other["Estado"]);
+
+        if ($Other["Colaborador"] !== '*')
+            $query->where('IDColaborador', $Other["Colaborador"]);
+
         if ($Other["Desde"] !== '*')
             $query->whereBetween('created_at', [$Other["Desde"] . " 00:00:00", $Other["Hasta"] . " 23:59:59"]);
 
+        if ($search) {
+            $query->whereHas('empresa', function ($query) use ($search) {
+                $query->where('RUC', 'like', "%$search%");
+                $query->orWhere('RazonSocial', 'like', "%$search%");
+                $query->orWhere('NombreComercial', 'like', "%$search%");
+            });
+        }
+        $query->orderByDesc('created_at');
         $Inspeccion = $query->paginate($request->input('psize'));
         return response()->json($Inspeccion, 200);
     }

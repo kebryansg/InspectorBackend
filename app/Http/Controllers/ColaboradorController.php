@@ -55,7 +55,7 @@ class ColaboradorController extends Controller
             ->join('Compania', 'Compania.ID', 'IDCompania')
             ->where('Cargo.ID', $Parametro->Valor)
             ->get(['Colaborador.ID', DB::raw("concat(Colaborador.ApellidoPaterno, ' ', Colaborador.ApellidoMaterno, ' ', Colaborador.NombrePrimero ) as Colaborador")]);
-        return response($Clasificacion, 201);
+        return response($Clasificacion, 200);
     }
 
     /**

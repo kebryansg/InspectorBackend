@@ -123,7 +123,7 @@
                                     <td>Sector: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->sector->Descripcion }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td>Referencia: <span class="text-bold text-uppercase"></span></td>
+                                    <td>Referencia: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->Referencia  }}</span></td>
                                 </tr>
                                 <tr>
                                     <td>Teléfono de contacto: <span class="text-bold text-uppercase">{{ $Inspeccion->empresa->Telefono }}</span></td>
