@@ -581,4 +581,18 @@ class InspeccionController extends Controller
         $Comentario->save();
         return response()->json($Comentario, 201);
     }
+    public function ubicacion_colaborador(Request $request, $colaborador){
+        $Ubicacion = Inspeccion::with('empresa:ID,NombreComercial')
+            ->where('IDColaborador', $colaborador)
+            ->whereIn('Estado', ['APR', 'REP'])
+            ->whereNotNull('Latitud')
+            ->whereNotNull('Longitud')
+            ->get([
+                'ID',
+                'IDEmpresa',
+                'Latitud as lat',
+                'Longitud as lng',
+            ]);
+        return response()->json($Ubicacion, 200);
+    }
 }

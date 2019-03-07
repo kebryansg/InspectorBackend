@@ -216,6 +216,9 @@ $router->group(['middleware' => ['auth', 'valid']], function () use ($router) {
     $router->get('pdf_download/{id}', ['uses' => 'InspeccionController@downloadPDF']);
     $router->get('pdf_send/{id}', ['uses' => 'InspeccionController@sendMail']);
 
+    // Ubicacion
+
+
     #endregion
 
     #region Formulario
@@ -364,3 +367,5 @@ $router->get('inspeccion_pendupload', ["uses" => "InspeccionController@getInspec
 #region Reportes
 $router->get('users_rol', ["uses" => "ReportController@users_rol"]);
 #endregion
+
+$router->get('inspeccion/colaborador/{colaborador}', ["uses" => "InspeccionController@ubicacion_colaborador"]);
